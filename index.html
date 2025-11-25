@@ -1,0 +1,557 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Cert Advisor</title>
+    <style>
+        :root {
+            --primary: #4285f4;
+            --secondary: #34a853;
+            --accent: #ea4335;
+            --bg: #f9f9f9;
+            --card: #fff;
+            --text: #333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 70vh;
+            background-color: var(--card);
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.4;
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .bot-message {
+            align-self: flex-start;
+            background-color: #f1f1f1;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-top: 1px solid #ddd;
+        }
+        
+        #message-input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            outline: none;
+            font-size: 16px;
+        }
+        
+        #send-btn {
+            margin-left: 10px;
+            padding: 12px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        
+        #send-btn:hover {
+            background-color: #3367d6;
+        }
+        
+        .action-panel {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .action-card {
+            flex: 1;
+            background-color: var(--card);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .action-card h3 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            background-color: #f0f0f0;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        .rule-input {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .recommendation {
+            background-color: #e8f0fe;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .rule-tag {
+            display: inline-block;
+            background-color: #f1f3f4;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 5px;
+            color: #5f6368;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <h1>Training Cert Advisor</h1>
+            <p>AI-powered certification recommendations</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="action-panel">
+            <div class="action-card" id="upload-cv">
+                <h3>📄 Upload CV</h3>
+                <p>Upload candidate resumes to get personalized training recommendations</p>
+            </div>
+            <div class="action-card" id="define-rule">
+                <h3>⚙️ Define Rule</h3>
+                <p>Create business rules to customize the recommendation logic</p>
+            </div>
+            <div class="action-card" id="chat-help">
+                <h3>💬 Chat Help</h3>
+                <p>Ask questions about certifications and training programs</p>
+            </div>
+        </div>
+        
+        <div id="upload-section" style="display: none;">
+            <div class="upload-area" id="drop-area">
+                <h3>Drop CV files here or click to select</h3>
+                <p>Supports PDF, DOCX, and text formats</p>
+                <input type="file" id="file-input" multiple accept=".pdf,.docx,.txt">
+            </div>
+            <div id="upload-status"></div>
+        </div>
+        
+        <div id="rule-section" style="display: none;">
+            <textarea class="rule-input" id="rule-text" placeholder="Type your business rule here (e.g. 'Recommend PMP only if candidate has 5+ years of experience')"></textarea>
+            <button id="save-rule" style="margin-top: 10px; padding: 10px 20px; background-color: var(--secondary); color: white; border: none; border-radius: 4px; cursor: pointer;">Save Rule</button>
+            <div id="rules-list" style="margin-top: 20px;"></div>
+        </div>
+        
+        <div class="chat-container" id="chat-section" style="display: none;">
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot-message">
+                    Hello! I'm your Training Cert Advisor. How can I help you today?
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="message-input" placeholder="Type your message here...">
+                <button id="send-btn">Send</button>
+            </div>
+        </div>
+        
+        <div id="results-section" style="display: none; margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        // State management
+        const state = {
+            cvData: [],
+            rules: [],
+            chatHistory: [],
+            currentView: null
+        };
+        
+        // DOM elements
+        const sections = {
+            upload: document.getElementById('upload-section'),
+            rule: document.getElementById('rule-section'),
+            chat: document.getElementById('chat-section'),
+            results: document.getElementById('results-section')
+        };
+        
+        const actionCards = {
+            upload: document.getElementById('upload-cv'),
+            rule: document.getElementById('define-rule'),
+            chat: document.getElementById('chat-help')
+        };
+        
+        // Event listeners
+        actionCards.upload.addEventListener('click', () => showSection('upload'));
+        actionCards.rule.addEventListener('click', () => showSection('rule'));
+        actionCards.chat.addEventListener('click', () => showSection('chat'));
+        
+        document.getElementById('save-rule').addEventListener('click', saveRule);
+        document.getElementById('file-input').addEventListener('change', handleFileUpload);
+        document.getElementById('drop-area').addEventListener('click', () => document.getElementById('file-input').click());
+        document.getElementById('send-btn').addEventListener('click', sendMessage);
+        document.getElementById('message-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        // Drag and drop handling
+        const dropArea = document.getElementById('drop-area');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropArea.style.backgroundColor = '#e0e0e0';
+        }
+        
+        function unhighlight() {
+            dropArea.style.backgroundColor = '#f9f9f9';
+        }
+        
+        dropArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+        
+        // Core functions
+        function showSection(sectionName) {
+            // Hide all sections
+            Object.values(sections).forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show selected section
+            sections[sectionName].style.display = 'block';
+            state.currentView = sectionName;
+            
+            // If showing chat, focus input
+            if (sectionName === 'chat') {
+                document.getElementById('message-input').focus();
+            }
+        }
+        
+        function handleFileUpload(e) {
+            handleFiles(e.target.files);
+        }
+        
+        function handleFiles(files) {
+            const uploadStatus = document.getElementById('upload-status');
+            uploadStatus.innerHTML = '';
+            
+            if (files.length === 0) return;
+            
+            state.cvData = [];
+            uploadStatus.innerHTML = `<p>Processing ${files.length} file(s)...</p>`;
+            
+            // Simulate processing delay
+            setTimeout(() => {
+                uploadStatus.innerHTML += '<p>Files processed successfully!</p>';
+                
+                // Simulate extracting data from CVs
+                for (let i = 0; i < files.length; i++) {
+                    state.cvData.push({
+                        filename: files[i].name,
+                        name: `Candidate ${i+1}`,
+                        experience: Math.floor(Math.random() * 10) + 1,
+                        skills: ['Project Management', 'Agile', 'Leadership'].slice(0, Math.floor(Math.random() * 3) + 1),
+                        education: ['Bachelor\'s Degree', 'Master\'s Degree'][Math.floor(Math.random() * 2)]
+                    });
+                }
+                
+                // Show recommendations
+                showRecommendations();
+                showSection('results');
+            }, 1500);
+        }
+        
+        function saveRule() {
+            const ruleText = document.getElementById('rule-text').value.trim();
+            if (!ruleText) return;
+            
+            state.rules.push(ruleText);
+            updateRulesList();
+            document.getElementById('rule-text').value = '';
+            
+            // Show confirmation message
+            addBotMessage(`Rule saved: "${ruleText}"`);
+        }
+        
+        function updateRulesList() {
+            const rulesList = document.getElementById('rules-list');
+            rulesList.innerHTML = '<h3>Current Rules:</h3>';
+            
+            if (state.rules.length === 0) {
+                rulesList.innerHTML += '<p>No rules defined yet.</p>';
+                return;
+            }
+            
+            const ul = document.createElement('ul');
+            state.rules.forEach((rule, index) => {
+                const li = document.createElement('li');
+                li.textContent = rule;
+                ul.appendChild(li);
+            });
+            
+            rulesList.appendChild(ul);
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addUserMessage(message);
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                let response;
+                
+                if (message.toLowerCase().includes('hello') || message.toLowerCase().includes('hi')) {
+                    response = "Hello! How can I assist you with training and certification recommendations today?";
+                } else if (message.toLowerCase().includes('certification') || message.toLowerCase().includes('training')) {
+                    response = `Based on your query about "${message}", I'd recommend considering professional certifications that align with your interests. Could you tell me more about your background or upload your CV for personalized recommendations?`;
+                } else if (message.toLowerCase().includes('upload') || message.toLowerCase().includes('cv')) {
+                    response = "You can upload CVs by clicking the 'Upload CV' button above. I'll analyze them and provide recommendations based on the candidates' experience and skills.";
+                } else if (message.toLowerCase().includes('rule') || message.toLowerCase().includes('business')) {
+                    response = "Business rules help customize recommendations. Click 'Define Rule' above to create rules like 'Recommend PMP only for candidates with 5+ years experience'.";
+                } else {
+                    response = "I'm your Training Cert Advisor. I can help with certification recommendations, CV analysis, and applying business rules to tailor suggestions. How would you like to proceed?";
+                }
+                
+                addBotMessage(response);
+            }, 1000);
+        }
+        
+        function addUserMessage(text) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user-message';
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function addBotMessage(text) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot-message';
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function scrollToBottom() {
+            const messagesDiv = document.getElementById('chat-messages');
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function showRecommendations() {
+            const resultsDiv = document.getElementById('results-section');
+            resultsDiv.innerHTML = '<h2>Recommendation Results</h2>';
+            
+            if (state.cvData.length === 0) {
+                resultsDiv.innerHTML += '<p>No CVs processed yet.</p>';
+                return;
+            }
+            
+            state.cvData.forEach(cv => {
+                const card = document.createElement('div');
+                card.style.marginBottom = '30px';
+                card.style.padding = '20px';
+                card.style.backgroundColor = 'white';
+                card.style.borderRadius = '8px';
+                card.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                
+                card.innerHTML = `
+                    <h3>${cv.name} (${cv.experience} years experience)</h3>
+                    <p>Skills: ${cv.skills.join(', ')}</p>
+                    <p>Education: ${cv.education}</p>
+                    <hr>
+                    <h4>Recommended Certifications:</h4>
+                `;
+                
+                const recommendations = generateRecommendations(cv);
+                recommendations.forEach(rec => {
+                    const recDiv = document.createElement('div');
+                    recDiv.className = 'recommendation';
+                    recDiv.innerHTML = `
+                        <h4>${rec.name}</h4>
+                        <p>${rec.reason}</p>
+                        ${rec.rulesApplied.length > 0 ? `<p>Rules applied: ${rec.rulesApplied.map(r => `<span class="rule-tag">${r}</span>`).join('')}</p>` : ''}
+                    `;
+                    card.appendChild(recDiv);
+                });
+                
+                resultsDiv.appendChild(card);
+            });
+        }
+        
+        function generateRecommendations(cv) {
+            // Mock certification catalog
+            const certifications = [
+                {
+                    name: 'PMP (Project Management Professional)',
+                    minExperience: 5,
+                    requiredSkills: ['Project Management'],
+                    description: 'Global recognition for project managers with proven experience.'
+                },
+                {
+                    name: 'ITIL Foundation',
+                    minExperience: 0,
+                    requiredSkills: ['IT Service Management'],
+                    description: 'Entry-level certification for IT service management best practices.'
+                },
+                {
+                    name: 'Agile Certified Practitioner',
+                    minExperience: 2,
+                    requiredSkills: ['Agile'],
+                    description: 'For professionals using agile approaches in project management.'
+                },
+                {
+                    name: 'Certified Scrum Master',
+                    minExperience: 1,
+                    requiredSkills: ['Agile'],
+                    description: 'Validates knowledge of Scrum principles and practices.'
+                },
+                {
+                    name: 'Google Cloud Professional Architect',
+                    minExperience: 3,
+                    requiredSkills: ['Cloud Computing'],
+                    description: 'For cloud architects using Google Cloud technologies.'
+                }
+            ];
+            
+            const recommendations = [];
+            const rulesApplied = [];
+            
+            // Apply business rules if any
+            state.rules.forEach(rule => {
+                if (rule.toLowerCase().includes('pmp') && rule.toLowerCase().includes('5')) {
+                    if (cv.experience >= 5) {
+                        rulesApplied.push('PMP 5+ year rule');
+                    }
+                }
+            });
+            
+            // Generate recommendations based on CV
+            certifications.forEach(cert => {
+                const hasSkills = cert.requiredSkills.some(skill => cv.skills.includes(skill));
+                const hasExperience = cv.experience >= cert.minExperience;
+                
+                if (hasSkills && hasExperience) {
+                    recommendations.push({
+                        name: cert.name,
+                        reason: `Matches ${cv.name}'s ${cert.minExperience > 0 ? `${cv.experience} years experience` : 'profile'} and skills in ${cert.requiredSkills.join(', ')}. ${cert.description}`,
+                        rulesApplied: rulesApplied.filter(r => r.includes(cert.name.split(' ')[0]))
+                    });
+                }
+            });
+            
+            return recommendations;
+        }
+        
+        // Initialize
+        updateRulesList();
+        showSection('chat');
+    </script>
+</body>
+</html>
