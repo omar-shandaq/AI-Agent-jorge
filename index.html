@@ -1,557 +1,621 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Training Cert Advisor</title>
+    <title>SkillMatch Pro</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <style>
         :root {
-            --primary: #4285f4;
-            --secondary: #34a853;
-            --accent: #ea4335;
-            --bg: #f9f9f9;
-            --card: #fff;
-            --text: #333;
+            --primary: #3f51b5;
+            --primary-dark: #303f9f;
+            --secondary: #ff9800;
+            --secondary-dark: #e68900;
+            --light: #f5f5f5;
+            --dark: #212121;
+            --text-on-primary: #ffffff;
+            --border-color: #ddd;
+            --card-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: var(--bg);
-            color: var(--text);
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
         }
-        
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
-        
         header {
             background-color: var(--primary);
-            color: white;
-            padding: 15px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            color: var(--text-on-primary);
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        
-        .header-content {
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 500;
+        }
+        .tagline {
+            font-style: italic;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        .main-content {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 20px;
+            margin-top: 30px;
         }
-        
-        .chat-container {
+        .chat-section {
+            flex: 2;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+            height: 650px;
             display: flex;
             flex-direction: column;
-            height: 70vh;
-            background-color: var(--card);
-            border-radius: 8px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            margin-top: 20px;
-            overflow: hidden;
         }
-        
+        .side-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .panel-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+        }
         .chat-messages {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 20px;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
         }
-        
         .message {
-            max-width: 70%;
-            padding: 12px 16px;
+            padding: 10px 15px;
             border-radius: 18px;
-            line-height: 1.4;
+            max-width: 80%;
+            word-wrap: break-word;
         }
-        
         .user-message {
-            align-self: flex-end;
             background-color: var(--primary);
-            color: white;
+            color: var(--text-on-primary);
+            align-self: flex-end;
             border-bottom-right-radius: 4px;
         }
-        
         .bot-message {
+            background-color: #e0e0e0;
+            color: var(--dark);
             align-self: flex-start;
-            background-color: #f1f1f1;
             border-bottom-left-radius: 4px;
         }
-        
         .chat-input {
             display: flex;
-            padding: 15px;
-            background-color: #f5f5f5;
-            border-top: 1px solid #ddd;
+            gap: 10px;
         }
-        
-        #message-input {
+        #user-input {
             flex-grow: 1;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 24px;
-            outline: none;
-            font-size: 16px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            font-size: 1rem;
         }
-        
-        #send-btn {
-            margin-left: 10px;
-            padding: 12px 20px;
+        button {
             background-color: var(--primary);
-            color: white;
+            color: var(--text-on-primary);
             border: none;
-            border-radius: 24px;
+            padding: 12px 20px;
+            border-radius: 25px;
             cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.2s;
+            transition: background-color 0.3s, transform 0.2s;
+            font-weight: 500;
         }
-        
-        #send-btn:hover {
-            background-color: #3367d6;
+        button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
         }
-        
-        .action-panel {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
         }
-        
-        .action-card {
-            flex: 1;
-            background-color: var(--card);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .action-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .action-card h3 {
-            color: var(--primary);
-            margin-top: 0;
-        }
-        
-        .upload-area {
-            border: 2px dashed #ccc;
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
             padding: 30px;
             text-align: center;
             border-radius: 8px;
-            margin-top: 20px;
-            background-color: #f9f9f9;
             cursor: pointer;
+            transition: border-color 0.3s, background-color 0.3s;
         }
-        
-        .upload-area:hover {
-            background-color: #f0f0f0;
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background-color: #f9f9f9;
         }
-        
         #file-input {
             display: none;
         }
-        
-        .rule-input {
+        textarea {
             width: 100%;
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        
-        .recommendation {
-            background-color: #e8f0fe;
-            border-left: 4px solid var(--primary);
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 0 8px 8px 0;
-        }
-        
-        .rule-tag {
-            display: inline-block;
-            background-color: #f1f3f4;
-            padding: 4px 8px;
+            min-height: 120px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
-            font-size: 12px;
-            margin-right: 5px;
-            color: #5f6368;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        .results-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .candidate-result {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .candidate-result:last-child {
+            border-bottom: none;
+        }
+        .candidate-name {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        .candidate-summary {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .recommendation-card {
+            background: #f9f9f9;
+            border-left: 5px solid var(--secondary);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .recommendation-card:hover {
+            transform: scale(1.02);
+            box-shadow: var(--card-shadow);
+        }
+        .recommendation-title {
+            font-weight: bold;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+        .recommendation-reason {
+            font-style: italic;
+            color: #555;
+            margin-top: 5px;
+        }
+        .recommendation-rule {
+            font-size: 0.9rem;
+            color: var(--secondary-dark);
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        .hidden {
+            display: none;
+        }
+        .status-message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        .status-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .status-error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="container header-content">
-            <h1>Training Cert Advisor</h1>
-            <p>AI-powered certification recommendations</p>
+        <div class="container">
+            <h1><i class="fas fa-user-graduate"></i> SkillMatch Pro</h1>
+            <p class="tagline">AI-powered training and certification recommendations</p>
         </div>
     </header>
     
     <div class="container">
-        <div class="action-panel">
-            <div class="action-card" id="upload-cv">
-                <h3>📄 Upload CV</h3>
-                <p>Upload candidate resumes to get personalized training recommendations</p>
-            </div>
-            <div class="action-card" id="define-rule">
-                <h3>⚙️ Define Rule</h3>
-                <p>Create business rules to customize the recommendation logic</p>
-            </div>
-            <div class="action-card" id="chat-help">
-                <h3>💬 Chat Help</h3>
-                <p>Ask questions about certifications and training programs</p>
-            </div>
-        </div>
-        
-        <div id="upload-section" style="display: none;">
-            <div class="upload-area" id="drop-area">
-                <h3>Drop CV files here or click to select</h3>
-                <p>Supports PDF, DOCX, and text formats</p>
-                <input type="file" id="file-input" multiple accept=".pdf,.docx,.txt">
-            </div>
-            <div id="upload-status"></div>
-        </div>
-        
-        <div id="rule-section" style="display: none;">
-            <textarea class="rule-input" id="rule-text" placeholder="Type your business rule here (e.g. 'Recommend PMP only if candidate has 5+ years of experience')"></textarea>
-            <button id="save-rule" style="margin-top: 10px; padding: 10px 20px; background-color: var(--secondary); color: white; border: none; border-radius: 4px; cursor: pointer;">Save Rule</button>
-            <div id="rules-list" style="margin-top: 20px;"></div>
-        </div>
-        
-        <div class="chat-container" id="chat-section" style="display: none;">
-            <div class="chat-messages" id="chat-messages">
-                <div class="message bot-message">
-                    Hello! I'm your Training Cert Advisor. How can I help you today?
+        <div class="main-content">
+            <section class="chat-section">
+                <h2><i class="fas fa-comments"></i> Chat Assistant</h2>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message bot-message">
+                        Hello! I'm your training and certification assistant. I can help you:
+                        <ul>
+                            <li>Discuss training programs and certificates</li>
+                            <li>Analyze CVs for suitable recommendations</li>
+                            <li>Adjust recommendations based on your business rules</li>
+                        </ul>
+                        How can I help you today?
+                    </div>
                 </div>
-            </div>
-            <div class="chat-input">
-                <input type="text" id="message-input" placeholder="Type your message here...">
-                <button id="send-btn">Send</button>
+                <div class="chat-input">
+                    <input type="text" id="user-input" placeholder="Ask about training programs, upload CVs, or set rules...">
+                    <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </section>
+            
+            <div class="side-panel">
+                <section class="panel-section upload-section">
+                    <h2><i class="fas fa-file-upload"></i> Upload CVs</h2>
+                    <div class="file-upload-area" id="cv-upload-area">
+                        <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                        <p>Drag & drop CV files here</p>
+                        <p>or click to browse</p>
+                        <input type="file" id="file-input" multiple accept=".pdf,.docx,.txt">
+                    </div>
+                    <button id="analyze-button" style="width: 100%; margin-top: 15px;"><i class="fas fa-brain"></i> Analyze CVs</button>
+                    <div id="upload-status"></div>
+                </section>
+                
+                <section class="panel-section rules-section">
+                    <h2><i class="fas fa-gavel"></i> Business Rules</h2>
+                    <textarea id="rules-input" placeholder="Add your business rules here, one per line.&#10;e.g., 'Recommend PMP only if the candidate has 5+ years of experience.'"></textarea>
+                    <button id="update-rules" style="width: 100%; margin-top: 10px;"><i class="fas fa-sync-alt"></i> Update Rules</button>
+                    <div id="rules-status"></div>
+                </section>
             </div>
         </div>
         
-        <div id="results-section" style="display: none; margin-top: 20px;"></div>
+        <section class="results-section hidden" id="results-section">
+            <h2><i class="fas fa-star"></i> Recommendations</h2>
+            <div id="recommendations-container">
+                <!-- Results will be populated here by JavaScript -->
+            </div>
+        </section>
     </div>
 
+    <!-- External Libraries for File Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
     <script>
-        // State management
-        const state = {
-            cvData: [],
-            rules: [],
-            chatHistory: [],
-            currentView: null
-        };
-        
-        // DOM elements
-        const sections = {
-            upload: document.getElementById('upload-section'),
-            rule: document.getElementById('rule-section'),
-            chat: document.getElementById('chat-section'),
-            results: document.getElementById('results-section')
-        };
-        
-        const actionCards = {
-            upload: document.getElementById('upload-cv'),
-            rule: document.getElementById('define-rule'),
-            chat: document.getElementById('chat-help')
-        };
-        
-        // Event listeners
-        actionCards.upload.addEventListener('click', () => showSection('upload'));
-        actionCards.rule.addEventListener('click', () => showSection('rule'));
-        actionCards.chat.addEventListener('click', () => showSection('chat'));
-        
-        document.getElementById('save-rule').addEventListener('click', saveRule);
-        document.getElementById('file-input').addEventListener('change', handleFileUpload);
-        document.getElementById('drop-area').addEventListener('click', () => document.getElementById('file-input').click());
-        document.getElementById('send-btn').addEventListener('click', sendMessage);
-        document.getElementById('message-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-        
-        // Drag and drop handling
-        const dropArea = document.getElementById('drop-area');
-        
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, preventDefaults, false);
-        });
-        
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropArea.addEventListener(eventName, highlight, false);
-        });
-        
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, unhighlight, false);
-        });
-        
-        function highlight() {
-            dropArea.style.backgroundColor = '#e0e0e0';
-        }
-        
-        function unhighlight() {
-            dropArea.style.backgroundColor = '#f9f9f9';
-        }
-        
-        dropArea.addEventListener('drop', handleDrop, false);
-        
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleFiles(files);
-        }
-        
-        // Core functions
-        function showSection(sectionName) {
-            // Hide all sections
-            Object.values(sections).forEach(section => {
-                section.style.display = 'none';
-            });
-            
-            // Show selected section
-            sections[sectionName].style.display = 'block';
-            state.currentView = sectionName;
-            
-            // If showing chat, focus input
-            if (sectionName === 'chat') {
-                document.getElementById('message-input').focus();
-            }
-        }
-        
-        function handleFileUpload(e) {
-            handleFiles(e.target.files);
-        }
-        
-        function handleFiles(files) {
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- CONFIGURATION ---
+            // !!! IMPORTANT: REPLACE 'YOUR_GEMINI_API_KEY' WITH YOUR ACTUAL API KEY !!!
+            const GEMINI_API_KEY = 'AIzaSyAs7r0GPX-cO_WT7oW_GFlTZqygWULdsXw';
+            const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+
+            // Set the worker for PDF.js
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+            // --- DOM ELEMENTS ---
+            const chatMessages = document.getElementById('chat-messages');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const fileInput = document.getElementById('file-input');
+            const analyzeButton = document.getElementById('analyze-button');
+            const rulesInput = document.getElementById('rules-input');
+            const updateRulesButton = document.getElementById('update-rules');
             const uploadStatus = document.getElementById('upload-status');
-            uploadStatus.innerHTML = '';
-            
-            if (files.length === 0) return;
-            
-            state.cvData = [];
-            uploadStatus.innerHTML = `<p>Processing ${files.length} file(s)...</p>`;
-            
-            // Simulate processing delay
-            setTimeout(() => {
-                uploadStatus.innerHTML += '<p>Files processed successfully!</p>';
-                
-                // Simulate extracting data from CVs
-                for (let i = 0; i < files.length; i++) {
-                    state.cvData.push({
-                        filename: files[i].name,
-                        name: `Candidate ${i+1}`,
-                        experience: Math.floor(Math.random() * 10) + 1,
-                        skills: ['Project Management', 'Agile', 'Leadership'].slice(0, Math.floor(Math.random() * 3) + 1),
-                        education: ['Bachelor\'s Degree', 'Master\'s Degree'][Math.floor(Math.random() * 2)]
-                    });
-                }
-                
-                // Show recommendations
-                showRecommendations();
-                showSection('results');
-            }, 1500);
-        }
-        
-        function saveRule() {
-            const ruleText = document.getElementById('rule-text').value.trim();
-            if (!ruleText) return;
-            
-            state.rules.push(ruleText);
-            updateRulesList();
-            document.getElementById('rule-text').value = '';
-            
-            // Show confirmation message
-            addBotMessage(`Rule saved: "${ruleText}"`);
-        }
-        
-        function updateRulesList() {
-            const rulesList = document.getElementById('rules-list');
-            rulesList.innerHTML = '<h3>Current Rules:</h3>';
-            
-            if (state.rules.length === 0) {
-                rulesList.innerHTML += '<p>No rules defined yet.</p>';
-                return;
-            }
-            
-            const ul = document.createElement('ul');
-            state.rules.forEach((rule, index) => {
-                const li = document.createElement('li');
-                li.textContent = rule;
-                ul.appendChild(li);
-            });
-            
-            rulesList.appendChild(ul);
-        }
-        
-        function sendMessage() {
-            const input = document.getElementById('message-input');
-            const message = input.value.trim();
-            if (!message) return;
-            
-            addUserMessage(message);
-            input.value = '';
-            
-            // Simulate AI response
-            setTimeout(() => {
-                let response;
-                
-                if (message.toLowerCase().includes('hello') || message.toLowerCase().includes('hi')) {
-                    response = "Hello! How can I assist you with training and certification recommendations today?";
-                } else if (message.toLowerCase().includes('certification') || message.toLowerCase().includes('training')) {
-                    response = `Based on your query about "${message}", I'd recommend considering professional certifications that align with your interests. Could you tell me more about your background or upload your CV for personalized recommendations?`;
-                } else if (message.toLowerCase().includes('upload') || message.toLowerCase().includes('cv')) {
-                    response = "You can upload CVs by clicking the 'Upload CV' button above. I'll analyze them and provide recommendations based on the candidates' experience and skills.";
-                } else if (message.toLowerCase().includes('rule') || message.toLowerCase().includes('business')) {
-                    response = "Business rules help customize recommendations. Click 'Define Rule' above to create rules like 'Recommend PMP only for candidates with 5+ years experience'.";
-                } else {
-                    response = "I'm your Training Cert Advisor. I can help with certification recommendations, CV analysis, and applying business rules to tailor suggestions. How would you like to proceed?";
-                }
-                
-                addBotMessage(response);
-            }, 1000);
-        }
-        
-        function addUserMessage(text) {
-            const messagesDiv = document.getElementById('chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message user-message';
-            messageDiv.textContent = text;
-            messagesDiv.appendChild(messageDiv);
-            scrollToBottom();
-        }
-        
-        function addBotMessage(text) {
-            const messagesDiv = document.getElementById('chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message bot-message';
-            messageDiv.textContent = text;
-            messagesDiv.appendChild(messageDiv);
-            scrollToBottom();
-        }
-        
-        function scrollToBottom() {
-            const messagesDiv = document.getElementById('chat-messages');
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-        
-        function showRecommendations() {
-            const resultsDiv = document.getElementById('results-section');
-            resultsDiv.innerHTML = '<h2>Recommendation Results</h2>';
-            
-            if (state.cvData.length === 0) {
-                resultsDiv.innerHTML += '<p>No CVs processed yet.</p>';
-                return;
-            }
-            
-            state.cvData.forEach(cv => {
-                const card = document.createElement('div');
-                card.style.marginBottom = '30px';
-                card.style.padding = '20px';
-                card.style.backgroundColor = 'white';
-                card.style.borderRadius = '8px';
-                card.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-                
-                card.innerHTML = `
-                    <h3>${cv.name} (${cv.experience} years experience)</h3>
-                    <p>Skills: ${cv.skills.join(', ')}</p>
-                    <p>Education: ${cv.education}</p>
-                    <hr>
-                    <h4>Recommended Certifications:</h4>
-                `;
-                
-                const recommendations = generateRecommendations(cv);
-                recommendations.forEach(rec => {
-                    const recDiv = document.createElement('div');
-                    recDiv.className = 'recommendation';
-                    recDiv.innerHTML = `
-                        <h4>${rec.name}</h4>
-                        <p>${rec.reason}</p>
-                        ${rec.rulesApplied.length > 0 ? `<p>Rules applied: ${rec.rulesApplied.map(r => `<span class="rule-tag">${r}</span>`).join('')}</p>` : ''}
-                    `;
-                    card.appendChild(recDiv);
-                });
-                
-                resultsDiv.appendChild(card);
-            });
-        }
-        
-        function generateRecommendations(cv) {
-            // Mock certification catalog
-            const certifications = [
-                {
-                    name: 'PMP (Project Management Professional)',
-                    minExperience: 5,
-                    requiredSkills: ['Project Management'],
-                    description: 'Global recognition for project managers with proven experience.'
-                },
-                {
-                    name: 'ITIL Foundation',
-                    minExperience: 0,
-                    requiredSkills: ['IT Service Management'],
-                    description: 'Entry-level certification for IT service management best practices.'
-                },
-                {
-                    name: 'Agile Certified Practitioner',
-                    minExperience: 2,
-                    requiredSkills: ['Agile'],
-                    description: 'For professionals using agile approaches in project management.'
-                },
-                {
-                    name: 'Certified Scrum Master',
-                    minExperience: 1,
-                    requiredSkills: ['Agile'],
-                    description: 'Validates knowledge of Scrum principles and practices.'
-                },
-                {
-                    name: 'Google Cloud Professional Architect',
-                    minExperience: 3,
-                    requiredSkills: ['Cloud Computing'],
-                    description: 'For cloud architects using Google Cloud technologies.'
-                }
+            const rulesStatus = document.getElementById('rules-status');
+            const resultsSection = document.getElementById('results-section');
+            const recommendationsContainer = document.getElementById('recommendations-container');
+            const cvUploadArea = document.getElementById('cv-upload-area');
+
+            // --- APPLICATION STATE ---
+            let userRules = [];
+            let uploadedCvs = []; // Stores { name, text }
+            let chatHistory = [];
+
+            // --- PREDEFINED CATALOG ---
+            const certificateCatalog = [
+                { id: 'pmp', name: 'Project Management Professional (PMP)', description: 'Globally recognized project management certification for experienced project managers.' },
+                { id: 'itil', name: 'ITIL Foundation', description: 'Entry-level certification for IT service management (ITSM).' },
+                { id: 'aws_saa', name: 'AWS Certified Solutions Architect - Associate', description: 'Certification for designing distributed systems on AWS.' },
+                { id: 'csm', name: 'Certified ScrumMaster (CSM)', description: 'Certification for adopting the Scrum framework for agile project management.' },
+                { id: 'ccna', name: 'Cisco Certified Network Associate (CCNA)', description: ' foundational certification for networking skills and Cisco technologies.' },
+                { id: 'gcp_ace', name: 'Google Cloud Associate Cloud Engineer', description: 'Certification for deploying applications, monitoring projects, and maintaining enterprise projects on Google Cloud.' },
+                { id: 'azure_admin', name: 'Microsoft Certified: Azure Administrator Associate', description: 'Certification for implementing, monitoring, and maintaining Microsoft Azure solutions.' }
             ];
+            const catalogString = certificateCatalog.map(c => `- ID: ${c.id}, Name: ${c.name}, Description: ${c.description}`).join('\n');
+
+            // --- HELPER FUNCTIONS ---
+            function addMessage(text, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+                messageDiv.innerHTML = text.replace(/\n/g, '<br>'); // Allow for line breaks in bot messages
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            function updateStatus(element, message, isError = false) {
+                element.innerHTML = `<div class="status-message ${isError ? 'status-error' : 'status-success'}">${message}</div>`;
+                setTimeout(() => { element.innerHTML = ''; }, 5000); // Clear status after 5 seconds
+            }
+
+            function showLoading(element, message) {
+                element.innerHTML = `<div class="loader"></div>${message}`;
+            }
             
-            const recommendations = [];
-            const rulesApplied = [];
-            
-            // Apply business rules if any
-            state.rules.forEach(rule => {
-                if (rule.toLowerCase().includes('pmp') && rule.toLowerCase().includes('5')) {
-                    if (cv.experience >= 5) {
-                        rulesApplied.push('PMP 5+ year rule');
+            function hideLoading(element) {
+                element.innerHTML = '';
+            }
+
+            // --- CORE API CALL ---
+            async function callGeminiAPI(prompt, history = []) {
+                const requestBody = {
+                    contents: [
+                        ...history,
+                        { role: "user", parts: [{ text: prompt }] }
+                    ]
+                };
+
+                const response = await fetch(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+                }
+
+                const data = await response.json();
+                const botResponse = data.candidates[0].content.parts[0].text;
+                
+                // Update history for context in subsequent calls
+                history.push({ role: "user", parts: [{ text: prompt }] });
+                history.push({ role: "model", parts: [{ text: botResponse }] });
+                
+                return botResponse;
+            }
+
+            // --- FILE PROCESSING ---
+            async function extractTextFromFile(file) {
+                if (file.type === 'application/pdf') {
+                    const dataBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument(dataBuffer).promise;
+                    let fullText = '';
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + '\n';
                     }
+                    return fullText;
+                } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({ arrayBuffer });
+                    return result.value;
+                } else if (file.type === 'text/plain') {
+                    return await file.text();
+                }
+                throw new Error(`Unsupported file type: ${file.type}`);
+            }
+            
+            // --- EVENT LISTENERS ---
+
+            // Chat functionality
+            sendButton.addEventListener('click', handleSendMessage);
+            userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSendMessage(); });
+
+            async function handleSendMessage() {
+                const message = userInput.value.trim();
+                if (!message) return;
+
+                addMessage(message, true);
+                userInput.value = '';
+                sendButton.disabled = true;
+
+                try {
+                    const response = await callGeminiAPI(message, chatHistory);
+                    addMessage(response);
+                } catch (error) {
+                    console.error("Chat API Error:", error);
+                    addMessage("Sorry, I'm having trouble connecting to my brain right now. Please check the API key and try again.");
+                } finally {
+                    sendButton.disabled = false;
+                }
+            }
+
+            // File upload functionality
+            cvUploadArea.addEventListener('click', () => fileInput.click());
+            cvUploadArea.addEventListener('dragover', (e) => { e.preventDefault(); cvUploadArea.style.borderColor = 'var(--primary)'; });
+            cvUploadArea.addEventListener('dragleave', () => { cvUploadArea.style.borderColor = 'var(--border-color)'; });
+            cvUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                cvUploadArea.style.borderColor = 'var(--border-color)';
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect();
+            });
+
+            fileInput.addEventListener('change', handleFileSelect);
+
+            function handleFileSelect() {
+                uploadedCvs = []; // Reset previous selections
+                const files = Array.from(fileInput.files);
+                if (files.length > 0) {
+                    updateStatus(uploadStatus, `Selected ${files.length} file(s): ${files.map(f => f.name).join(', ')}`);
+                } else {
+                    uploadStatus.innerHTML = '';
+                }
+            }
+
+            // Analyze CVs
+            analyzeButton.addEventListener('click', async () => {
+                const files = Array.from(fileInput.files);
+                if (files.length === 0) {
+                    updateStatus(uploadStatus, "Please select at least one CV file.", true);
+                    return;
+                }
+
+                showLoading(uploadStatus, "Extracting text from CVs...");
+                analyzeButton.disabled = true;
+
+                try {
+                    for (const file of files) {
+                        const text = await extractTextFromFile(file);
+                        uploadedCvs.push({ name: file.name, text: text });
+                    }
+                    
+                    showLoading(uploadStatus, "Analyzing CVs with AI...");
+                    const analysisPrompt = `
+                        You are an expert career counselor and training analyst. Analyze the provided CVs and recommend suitable training or certifications.
+                        
+                        Here is the catalog of available certifications:
+                        ${catalogString}
+                        
+                        Here are the business rules to follow:
+                        ${userRules.length > 0 ? userRules.map(r => `- ${r}`).join('\n') : 'No specific business rules provided.'}
+                        
+                        Here are the CVs to analyze:
+                        ${uploadedCvs.map(cv => `--- CV for: ${cv.name} ---\n${cv.text}`).join('\n\n')}
+                        
+                        For each CV, provide recommendations in a structured JSON format. The JSON should be an array of objects, where each object represents one candidate. Each candidate object should have:
+                        - "candidateName": The name of the candidate.
+                        - "recommendations": An array of recommendation objects. Each recommendation object must have:
+                            - "certId": The ID of the certification from the catalog.
+                            - "certName": The full name of the certification.
+                            - "reason": A clear explanation of why this certification is relevant to the candidate's profile.
+                            - "rulesApplied": An array of strings, listing any business rules that specifically influenced this recommendation. If no rules applied, this should be an empty array [].
+
+                        **Crucial Instructions:**
+                        - Respond with ONLY the JSON array. Do not include any introductory text, explanations, or markdown formatting like \`\`\`json.
+                        - Ensure the output is valid, parseable JSON.
+                    `;
+                    
+                    const aiResponse = await callGeminiAPI(analysisPrompt);
+                    const recommendations = JSON.parse(aiResponse);
+                    displayRecommendations(recommendations);
+                    updateStatus(uploadStatus, `Analysis complete for ${files.length} CV(s).`);
+
+                } catch (error) {
+                    console.error("Analysis Error:", error);
+                    updateStatus(uploadStatus, `Failed to analyze CVs. Error: ${error.message}`, true);
+                } finally {
+                    hideLoading(uploadStatus);
+                    analyzeButton.disabled = false;
                 }
             });
-            
-            // Generate recommendations based on CV
-            certifications.forEach(cert => {
-                const hasSkills = cert.requiredSkills.some(skill => cv.skills.includes(skill));
-                const hasExperience = cv.experience >= cert.minExperience;
-                
-                if (hasSkills && hasExperience) {
-                    recommendations.push({
-                        name: cert.name,
-                        reason: `Matches ${cv.name}'s ${cert.minExperience > 0 ? `${cv.experience} years experience` : 'profile'} and skills in ${cert.requiredSkills.join(', ')}. ${cert.description}`,
-                        rulesApplied: rulesApplied.filter(r => r.includes(cert.name.split(' ')[0]))
+
+            // Business rules
+            updateRulesButton.addEventListener('click', async () => {
+                const rulesText = rulesInput.value.trim();
+                if (!rulesText) {
+                    updateStatus(rulesStatus, "Please enter some rules before updating.", true);
+                    return;
+                }
+
+                showLoading(rulesStatus, "Parsing rules with AI...");
+                updateRulesButton.disabled = true;
+
+                try {
+                    const ruleParsingPrompt = `
+                        You are a business rules engine parser. Your task is to read the natural language rules provided by the user and convert them into a simple, structured format. For each rule, identify the target certification and the condition.
+                        
+                        Available Certification IDs are: ${certificateCatalog.map(c => c.id).join(', ')}.
+                        
+                        User's rules:
+                        ${rulesText}
+                        
+                        Please process these rules and return a JSON array of strings, where each string is a clean, rephrased version of the user's rule. If a rule is too vague or cannot be applied, you may omit it.
+                        
+                        Example:
+                        User input: "Recommend PMP only if the candidate has 5+ years of experience."
+                        Output: ["For PMP, candidate must have 5+ years of experience."]
+
+                        User input: "If experience < 2 years, recommend Foundation-level courses only."
+                        Output: ["For candidates with less than 2 years of experience, only recommend foundation-level certifications like ITIL."]
+
+                        Respond with ONLY the JSON array. No extra text.
+                    `;
+                    
+                    const aiResponse = await callGeminiAPI(ruleParsingPrompt);
+                    userRules = JSON.parse(aiResponse);
+                    updateStatus(rulesStatus, `Successfully parsed and applied ${userRules.length} rules.`);
+                    addMessage(`I've updated my recommendation logic based on your new rules.`);
+
+                } catch (error) {
+                    console.error("Rule Parsing Error:", error);
+                    updateStatus(rulesStatus, `Failed to parse rules. Error: ${error.message}`, true);
+                } finally {
+                    hideLoading(rulesStatus);
+                    updateRulesButton.disabled = false;
+                }
+            });
+
+            // --- UI RENDERING ---
+            function displayRecommendations(recommendations) {
+                recommendationsContainer.innerHTML = '';
+                if (!recommendations || recommendations.length === 0) {
+                    recommendationsContainer.innerHTML = '<p>No recommendations could be generated. Please check the CVs and try again.</p>';
+                } else {
+                    recommendations.forEach(candidate => {
+                        const candidateDiv = document.createElement('div');
+                        candidateDiv.className = 'candidate-result';
+                        
+                        const nameDiv = document.createElement('h3');
+                        nameDiv.className = 'candidate-name';
+                        nameDiv.textContent = candidate.candidateName || 'Candidate';
+                        candidateDiv.appendChild(nameDiv);
+
+                        if (candidate.recommendations && candidate.recommendations.length > 0) {
+                            candidate.recommendations.forEach(rec => {
+                                const card = document.createElement('div');
+                                card.className = 'recommendation-card';
+                                card.innerHTML = `
+                                    <div class="recommendation-title">${rec.certName}</div>
+                                    <div class="recommendation-reason"><i class="fas fa-lightbulb"></i> ${rec.reason}</div>
+                                    ${rec.rulesApplied && rec.rulesApplied.length > 0 ? `<div class="recommendation-rule"><i class="fas fa-gavel"></i> Rules Applied: ${rec.rulesApplied.join(', ')}</div>` : ''}
+                                `;
+                                candidateDiv.appendChild(card);
+                            });
+                        } else {
+                            candidateDiv.innerHTML += '<p>No specific recommendations found for this candidate based on the current rules and catalog.</p>';
+                        }
+                        recommendationsContainer.appendChild(candidateDiv);
                     });
                 }
-            });
-            
-            return recommendations;
-        }
-        
-        // Initialize
-        updateRulesList();
-        showSection('chat');
+                resultsSection.classList.remove('hidden');
+            }
+        });
     </script>
 </body>
 </html>
