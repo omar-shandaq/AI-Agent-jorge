@@ -4776,10 +4776,52 @@
                         : `Please provide a brief summary for my upcoming event: "${title}".`;
                     switchToAgentAndSendPrompt(prompt);
                 });
-                newPrepareBtn.addEventListener('click', () => {
-                    const prompt = `What preparations do I need for my event: "${title}"? Please consult and advise.`;
-                    switchToAgentAndSendPrompt(prompt);
-                });
+				
+				newPrepareBtn.addEventListener('click', () => {
+				    const prompt = `I need help preparing for this meeting: "${title}". Provide strategic guidance, key considerations, risks, and what I should ask.`;
+				
+				    // Get active agents only
+				    const activeAgents = personaData
+				        .filter(p => p.isActive === true)
+				        .map(p => p.id);
+				
+				    // Priority list
+				    const priorityOrder = ['nouf', 'omar', 'layla', 'hakim'];
+				
+				    // Determine lead agent (highest priority among active agents)
+				    let leadAgent = priorityOrder.find(id => activeAgents.includes(id));
+				
+				    // If no active agents, default to Hakim
+				    if (!leadAgent) {
+				        leadAgent = 'hakim';
+				    }
+				
+				    // Enable multi-agent mode
+				    isMultiAgentMode = true;
+				
+				    // Send message:
+				    // - Lead: speaks
+				    // - Other active agents: silent contributions
+				    activeAgents.forEach(agentId => {
+				        sendMessageToAgent(
+				            prompt,
+				            agentId,
+				            { silent: agentId !== leadAgent }
+				        );
+				    });
+				
+				    // If NO agents were active, manually call Hakim
+				    if (activeAgents.length === 0) {
+				        sendMessageToAgent(prompt, 'hakim', { silent: false });
+				    }
+				
+				    closeModal(document.getElementById('event-modal'));
+				});
+
+				
+				    closeModal(document.getElementById('event-modal'));
+				});
+
 
                 openModal(eventModal);
             }
@@ -7461,4 +7503,5 @@ Keep it brief and executive-level.`;
 
 
 </body></html>
+
 
