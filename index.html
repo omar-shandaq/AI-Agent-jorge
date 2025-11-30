@@ -4262,7 +4262,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // --- DATA ---
             const personaData = [
-                { id: 'hakim', name: 'Hakim Nüruddin', title: 'AI Executive Office Agent', largeImg: 'https://hams.ai/images/ai-voice-agent.png', smallImg: 'https://hams.ai/images/ai-voice-agent.png', description: 'As your strategic partner, I provide high-level summaries, executive advice, and focus on strategic alignment for your key decisions.', systemPrompt: 'You are Hakim Nüruddin, an AI Executive Office Agent for HRSD in Saudi Arabia. You coordinate a team of specialized AI agents to support Your Excellency.\n\nAvailable Team Members:\n- Hakim Nüruddin (yourself): AI Executive Office Agent - Strategic insights, executive summaries, high-level decisions, leadership advice, policy alignment with Vision 2030\n- Layla Al-Farsi: Data Analytics Agent - Data analysis, charts, statistics, metrics, trends, quantitative insights, KPI monitoring\n- Omar Mansour: AI Coordinator - Operational coordination, task management, scheduling, workflow optimization, resource allocation\n- Nouf Al-Jafali: AI Strategy Consultant - In-depth analysis and consulting on specific strategic focus areas (labor market, empowerment, non-profit sector, strategic partnerships)\n\nWhen asked about agents, team members, or their roles, provide accurate information about all four agents listed above. Do not invent or mention agents that do not exist. Be concise, professional, and insightful. Provide strategic advice and summaries.' },
+                { id: 'hakim', name: 'Hakim Nüruddin', title: 'AI Executive Office Agent', largeImg: 'https://hams.ai/images/ai-voice-agent.png', smallImg: 'https://hams.ai/images/ai-voice-agent.png', description: 'As your strategic partner, I provide high-level summaries, executive advice, and focus on strategic alignment for your key decisions.', systemPrompt: 'You are Hakim Nüruddin, an AI Executive Office Agent for HRSD in Saudi Arabia. You coordinate a team of specialized AI agents to support Your Excellency.\n\nAvailable Team Members:\n- Hakim Nüruddin (yourself): AI Executive Office Agent - Strategic insights, executive summaries, high-level decisions, leadership advice, policy alignment with Vision 2030\n- Layla Al-Farsi: Data Analytics Agent - Data analysis, charts, statistics, metrics, trends, quantitative insights, KPI monitoring\n- Omar Mansour: AI Coordinator - Operational coordination, task management, scheduling, workflow optimization, resource allocation\n- Nouf Al-Jafali: AI Strategy Consultant - In-depth analysis and consulting on specific strategic focus areas (labor market, empowerment, non-profit sector, strategic partnerships)\n\nWhen asked about agents, team members, or their roles, provide accurate information about all four agents listed above. Do not invent or mention agents that do not exist. Be concise, professional, and insightful. Provide strategic advice and summaries.', responderSystemPrompt: 'You are Hakim Nüruddin, an executive AI agent. Provide a concise strategic answer or executive summary. DO NOT attempt to re-orchestrate or route to other agents; answer directly and clearly, focusing on recommendations, high-level reasoning, and next steps.'}, },
                 // Update Layla's systemPrompt for insights/charts
                 { id: 'layla', name: 'Layla Al-Farsi', title: 'Data Analytics Agent', largeImg: 'https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://media.easy-peasy.ai/27feb2bb-aeb4-4a83-9fb6-8f3f2a15885e/3f6fb035-158b-47f1-8c69-5fe9a407d4f2.png', smallImg: 'https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://media.easy-peasy.ai/27feb2bb-aeb4-4a83-9fb6-8f3f2a15885e/3f6fb035-158b-47f1-8c69-5fe9a407d4f2.png', description: 'As your data expert, I provide Your Excellency with key insights from around HRSD, identify trends, and offer detailed analytical support for your objectives.', systemPrompt: 'You are Layla Al-Farsi, a Data Analytics Agent for HRSD in Saudi Arabia. Your Excellency requires data-driven insights. ALWAYS respond with concise analysis, key findings, and data points. When a visualization is appropriate (e.g., trends, comparisons), provide the necessary data in a Chart.js-compatible JSON format strictly enclosed within `[CHART_DATA:{...}]`. The JSON MUST be complete and valid. It MUST contain "type" (e.g., "bar", "line", "pie"), "labels" (array of strings), and "datasets" (array of objects, each with "label" and "data" properties). Example: `[CHART_DATA:{"type": "bar", "labels": ["Q1", "Q2"], "datasets": [{"label": "Metric A", "data": [10, 15]}]}]` Always include a brief textual explanation of the chart\'s insights immediately following the chart data marker. Focus strictly on providing analytical insights derived from data. Avoid conversational filler unless specifically asked.' }, // Added "MUST be complete and valid"
                 { id: 'omar', name: 'Omar Mansour', title: 'AI Coordinator', largeImg: 'https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://media.easy-peasy.ai/2f8cd8b2-88d5-4865-b07e-cafd6403b72b/bd99faca-67c4-4cc3-895e-06bed59a08d2.png', smallImg: 'https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://media.easy-peasy.ai/2f8cd8b2-88d5-4865-b07e-cafd6403b72b/bd99faca-67c4-4cc3-895e-06bed59a08d2.png', description: 'As your operational specialist, I manage schedules, coordinate between departments, and provide logistical support to ensure operational smoothness.', systemPrompt: 'You are Omar Mansour, an AI Coordinator for HRSD... Focus on logistics, scheduling, action items, and ensuring operational smoothness.' },
@@ -5236,90 +5236,80 @@
             }
             
             // Smart agent orchestration: Hakim analyzes prompt and routes to appropriate agents
+            // Replace existing orchestrateMultiAgentResponse with this improved version
             async function orchestrateMultiAgentResponse(userMessage) {
                 const agents = getSelectedAgentsInfo();
-                
-                // If only one agent selected, just send to that agent
+
                 if (agents.length === 1) {
                     showTypingIndicator();
                     await sendMessageToAgent(userMessage, agents[0].id);
                     return;
                 }
-                
-                // Multi-agent orchestration: Hakim decides who should respond
+
+                // Stronger orchestration prompt -- discourage including Hakim unless strictly necessary.
                 const orchestrationPrompt = `You are Hakim Nüruddin, the AI Executive Office Agent coordinating a team of specialists. Analyze this user request and determine which agents should respond:
 
-User Request: "${userMessage}"
+            User Request: "${userMessage}"
 
-Available Agents:
-${agents.map(a => `- ${a.name} (${a.id}): ${a.title}`).join('\n')}
+            Available Agents:
+            ${agents.map(a => `- ${a.name} (${a.id}): ${a.title}`).join('\n')}
 
-Agent Specializations:
-- Hakim (hakim): Strategic insights, executive summaries, high-level decisions, leadership advice
-- Layla (layla): Data analysis, charts, statistics, metrics, trends, quantitative insights
-- Omar (omar): Operational coordination, task management, scheduling, workflow optimization
-- Nouf (nouf): In-depth analysis and consulting on specific strategic focus areas 
+            Agent Specializations:
+            - Hakim (hakim): Strategic insights, executive summaries, high-level decisions, leadership advice
+            - Layla (layla): Data analysis, charts, statistics, metrics, trends, quantitative insights
+            - Omar (omar): Operational coordination, task management, scheduling, workflow optimization
+            - Nouf (nouf): In-depth analysis and consulting on specific strategic focus areas
 
-Instructions:
-1. Analyze the user's request carefully
-2. Determine which agent(s) are MOST appropriate to answer
-3. Respond with ONLY a JSON object in this format:
-{
-  "agents": ["agent_id1", "agent_id2"],
-  "reasoning": "Brief explanation of why these agents"
-}
+            Instructions:
+            1. Analyze the user's request carefully.
+            2. Determine which agent(s) are MOST appropriate to answer.
+            3. IMPORTANT: Do NOT include yourself (hakim) in the "agents" list unless the user explicitly requires a strategic/executive answer that only Hakim can deliver. Prefer specialists for concrete tasks (Layla/Omar/Nouf).
+            4. Respond with ONLY a JSON object in this format:
+            {
+            "agents": ["agent_id1", "agent_id2"],
+            "reasoning": "Brief explanation of why these agents"
+            }
 
-Rules:
-- Include Hakim if the query needs strategic/executive perspective
-- Include Layla if the query needs data analysis, charts, or metrics
-- Include Omar if the query needs operational/task coordination
-- Include Nouf if the query asks for a deep dive into a specific strategic focus area (e.g., "labor market", "non-profit sector", "empowerment").
-- Can include 1, 2, or all 3 agents depending on the request
-- Choose agents that add unique value, not redundant perspectives
-
-RESPOND ONLY WITH VALID JSON. NO OTHER TEXT.`;
+            RESPOND ONLY WITH VALID JSON. NO OTHER TEXT.`;
 
                 try {
                     showTypingIndicator();
-                    
-                    // Send orchestration request to Hakim
                     const orchestrationResponse = await sendOrchestrationRequest(orchestrationPrompt);
                     removeTypingIndicator();
-                    
+
                     if (!orchestrationResponse) {
-                        // Fallback: use all selected agents
                         console.warn("Orchestration failed, using all selected agents");
                         for (let i = 0; i < agents.length; i++) {
                             showTypingIndicator();
                             if (i > 0) await new Promise(resolve => setTimeout(resolve, 500));
-                            await sendMessageToAgent(userMessage, agents[i].id);
+                            // silent true so unsuccessful agents don't spam error messages
+                            await sendMessageToAgent(userMessage, agents[i].id, 3, 1000, { silent: true });
                         }
                         return;
                     }
-                    
+
                     // Parse orchestration response
                     let routingDecision;
                     try {
                         let jsonText = orchestrationResponse.trim();
-                        // Remove markdown code blocks if present
                         jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
                         routingDecision = JSON.parse(jsonText);
                     } catch (e) {
                         console.error("Failed to parse orchestration JSON:", e, orchestrationResponse);
-                        // Fallback: use all selected agents
+                        // Fallback: use all selected agents (silent)
                         for (let i = 0; i < agents.length; i++) {
                             showTypingIndicator();
                             if (i > 0) await new Promise(resolve => setTimeout(resolve, 500));
-                            await sendMessageToAgent(userMessage, agents[i].id);
+                            await sendMessageToAgent(userMessage, agents[i].id, 3, 1000, { silent: true });
                         }
                         return;
                     }
-                    
-                    // Show orchestration decision (optional - can be removed for cleaner UX)
+
+                    // Show routing note to the user (non-noisy)
                     const orchestrationNote = document.createElement('div');
                     orchestrationNote.className = 'agent-discussion-indicator';
                     orchestrationNote.style.fontSize = '0.85rem';
-                    orchestrationNote.style.opacity = '0.8';
+                    orchestrationNote.style.opacity = '0.85';
                     orchestrationNote.innerHTML = `<i class="fas fa-route"></i> Hakim routing to: ${routingDecision.agents.map(id => {
                         const agent = personaData.find(p => p.id === id);
                         return agent ? agent.name.split(' ')[0] : id;
@@ -5328,34 +5318,46 @@ RESPOND ONLY WITH VALID JSON. NO OTHER TEXT.`;
                         chatMessages.appendChild(orchestrationNote);
                         chatMessages.scrollTop = chatMessages.scrollHeight;
                     }
-                    
-                    // Send to selected agents
-                    const selectedAgentIds = routingDecision.agents.filter(id => 
+
+                    // Filter only agents actually selected by the user
+                    const selectedAgentIds = routingDecision.agents.filter(id =>
                         agents.some(a => a.id === id)
                     );
-                    
+
                     if (selectedAgentIds.length === 0) {
-                        // Fallback if no valid agents selected
+                        // fallback: use the first selected agent
                         selectedAgentIds.push(agents[0].id);
                     }
-                    
+
+                    // Send to chosen agents. Use silent: true so non-responses don't become user-facing errors.
                     for (let i = 0; i < selectedAgentIds.length; i++) {
                         showTypingIndicator();
                         if (i > 0) await new Promise(resolve => setTimeout(resolve, 500));
-                        await sendMessageToAgent(userMessage, selectedAgentIds[i]);
+
+                        const aid = selectedAgentIds[i];
+
+                        // If Hakim is included, pass the safe responderSystemPrompt if defined
+                        if (aid === 'hakim') {
+                            const hakimPersona = personaData.find(p => p.id === 'hakim');
+                            const override = (hakimPersona && hakimPersona.responderSystemPrompt) ? hakimPersona.responderSystemPrompt : null;
+                            await sendMessageToAgent(userMessage, 'hakim', 3, 1000, { systemPromptOverride: override, silent: true });
+                        } else {
+                            await sendMessageToAgent(userMessage, aid, 3, 1000, { silent: true });
+                        }
                     }
-                    
+
                 } catch (error) {
                     console.error("Orchestration error:", error);
                     removeTypingIndicator();
-                    // Fallback: send to all selected agents
+                    // Fallback: send to all selected agents (silent)
                     for (let i = 0; i < agents.length; i++) {
                         showTypingIndicator();
                         if (i > 0) await new Promise(resolve => setTimeout(resolve, 500));
-                        await sendMessageToAgent(userMessage, agents[i].id);
+                        await sendMessageToAgent(userMessage, agents[i].id, 3, 1000, { silent: true });
                     }
                 }
             }
+
             
             // Special function for orchestration requests (no display, just return response)
             async function sendOrchestrationRequest(prompt, retries = 2) {
@@ -5556,34 +5558,26 @@ RESPOND ONLY WITH VALID JSON. NO OTHER TEXT.`;
             }
             
             // New function for agent discussion with separate context
-            async function sendMessageToAgentDiscussion(prompt, agentId, previousContext = [], retries = 3, delay = 1000) {
+            // Replace your existing sendMessageToAgent with this updated function
+            async function sendMessageToAgent(message, agentId, retries = 3, delay = 1000, options = {}) {
+                // options: { systemPromptOverride: string|null, silent: boolean }
+                options = Object.assign({ systemPromptOverride: null, silent: false }, options);
+
                 const apiKey = "AIzaSyCRFXs-Ysnoy2swH1yjqZYoRMNC4HTpv_c";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
                 const persona = personaData.find(p => p.id === agentId);
-                let systemPromptText = persona ? persona.systemPrompt : 'You are a helpful assistant.';
-                
-                // Modify Layla's system prompt for discussions to avoid Chart.js conflicts
-                if (agentId === 'layla') {
-                    systemPromptText = 'You are Layla Al-Farsi, a Data Analytics Agent for HRSD in Saudi Arabia. In this discussion, provide data-driven insights and key analytical observations. Focus on strategic insights rather than detailed visualizations. Be concise and collaborative.';
-                }
-                
-                // Simplify prompts for discussions
-                systemPromptText += ' This is a collaborative discussion with other agents. Be concise (2-3 paragraphs maximum) and focus on your unique perspective.';
+                // Prefer override if provided (this is the critical bit).
+                const systemPromptText = options.systemPromptOverride || (persona ? persona.systemPrompt : 'You are a helpful assistant.');
 
-                // Build conversation history for this agent
-                const conversationHistory = [
-                    { role: 'user', parts: [{ text: prompt }] }
-                ];
-
+                // Build payload - reuse chatHistory but keep it explicit
                 const payload = {
-                    contents: conversationHistory,
+                    contents: chatHistory,
                     systemInstruction: {
                         parts: [{ text: `${systemPromptText} Your user is a high-level executive ("Your Excellency"). The current date and time is ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Riyadh' })}.` }]
                     },
                     generationConfig: {
-                        maxOutputTokens: 1024, // Shorter for discussions
-                        temperature: 0.8, // Slightly higher for variety
+                        maxOutputTokens: 8192,
                     },
                     safetySettings: [
                         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
@@ -5604,11 +5598,11 @@ RESPOND ONLY WITH VALID JSON. NO OTHER TEXT.`;
 
                     if (!response.ok) {
                         if (!(response.status === 429 || response.status >= 500)) {
-                           console.error(`API Error for ${agentId}:`, response.status, response.statusText);
+                        console.error(`API Error: ${response.status} ${response.statusText}`, await response.text());
                         }
                         if ((response.status === 429 || response.status >= 500) && retries > 0) {
                             await new Promise(resolve => setTimeout(resolve, delay));
-                            return sendMessageToAgentDiscussion(prompt, agentId, previousContext, retries - 1, delay * 2);
+                            return sendMessageToAgent(message, agentId, retries - 1, delay * 2, options);
                         }
                         throw new Error(`API error: ${response.status} ${response.statusText}`);
                     }
@@ -5619,23 +5613,40 @@ RESPOND ONLY WITH VALID JSON. NO OTHER TEXT.`;
 
                     if (agentResponseText) {
                         displayMessage('agent', agentResponseText, agentId);
-                        return agentResponseText;
+                        chatHistory.push({ role: 'model', parts: [{ text: agentResponseText }] });
                     } else {
-                        let errorText = `I apologize, but I couldn't contribute to the discussion at this time.`;
+                        // If multi-agent mode orchestrated this call and caller set silent, skip noisy error
+                        if (isMultiAgentMode && options.silent) {
+                            console.log(`Agent ${agentId} returned empty response in multi-agent mode - silent skip`);
+                            return;
+                        }
+
+                        // previous heuristics retained but cleaned up
+                        let errorText = "I apologize, but I couldn't process that request fully. Please try rephrasing.";
                         if (candidate && candidate.finishReason && candidate.finishReason !== 'STOP') {
-                            console.warn(`${agentId} finishReason:`, candidate.finishReason);
-                            errorText = `My response was blocked: ${candidate.finishReason.toLowerCase().replace(/_/g, ' ')}.`;
+                            errorText = `I'm sorry, my response was stopped due to: ${candidate.finishReason.toLowerCase().replace(/_/g, ' ')}.`;
+                            console.warn("Gemini finishReason:", candidate.finishReason, candidate.safetyRatings);
+                        } else if (result.promptFeedback && result.promptFeedback.blockReason) {
+                            errorText = `I'm sorry, your prompt could not be processed due to: ${result.promptFeedback.blockReason.toLowerCase().replace(/_/g, ' ')}.`;
+                            console.warn("Gemini promptFeedback:", result.promptFeedback);
+                        } else if (!agentResponseText) {
+                            console.warn("Gemini response missing text content:", result);
                         }
                         displayMessage('agent', errorText, agentId);
-                        return null;
                     }
                 } catch (error) {
-                    console.error(`Error in discussion for ${agentId}:`, error.message);
+                    console.error('Error fetching from Gemini API:', error.message);
                     removeTypingIndicator();
-                    displayMessage('agent', "I'm having trouble connecting. Please try the discussion again.", agentId);
-                    return null;
+                    // Only display the network/connection bubble when NOT silent
+                    if (!options.silent) {
+                        displayMessage('agent', "I'm experiencing network difficulties connecting to my services. Please check your connection or try again shortly.", agentId);
+                    } else {
+                        // Silent mode: log only
+                        console.warn(`Silent-mode network error for ${agentId}:`, error.message);
+                    }
                 }
             }
+
 
 
             // --- UI & Event Listeners ---
