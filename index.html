@@ -4780,7 +4780,22 @@
 				newPrepareBtn.addEventListener('click', () => {
                     const prompt = `What preparations do I need for my event: "${title}"? Please consult and advise.`;
                     switchToAgentAndSendPrompt(prompt);
-				});
+
+					// Route
+				    const { leadAgent, activeAgents } = selectLeadAgent(
+				        prompt,
+				        ['nouf', 'omar', 'layla', 'hakim']
+				    );
+				
+				    isMultiAgentMode = true;
+				
+				    // Agents respond (UI already ready)
+				    activeAgents.forEach(aid => {
+				        sendMessageToAgent(prompt, aid, { silent: aid !== leadAgent });
+				    });
+				
+				    closeModal(document.getElementById('event-modal'));
+								});
 
                 openModal(eventModal);
             }
@@ -4925,41 +4940,58 @@
                 parentEl.appendChild(columnsWrapper);
             }
 				
-			function selectLeadAgent(question, priorityOrder = ['nouf', 'omar', 'layla', 'hakim']) {
-			    const text = question.toLowerCase();
+			function selectLeadAgent(prompt, allowedAgents) {
+			    const lower = prompt.toLowerCase();
 			
-			    const activeAgents = personaData
-			        .filter(p => p.isActive)
-			        .map(p => ({
-			            id: p.id,
-			            capabilities: p.capabilities || []
-			        }));
+			    // Filter to only active agents you passed in
+			    const active = personaData
+			        .filter(a => allowedAgents.includes(a.id) && a.isActive)
+			        .map(a => a.id);
 			
-			    // Score by capability match
-			    const scores = activeAgents.map(agent => {
-			        let score = 0;
-			
-			        agent.capabilities.forEach(cap => {
-			            if (text.includes(cap)) score += 10;
-			        });
-			
-			        // Fallback priority (if scores are equal)
-			        const fallbackRank = priorityOrder.indexOf(agent.id);
-			        if (fallbackRank !== -1) {
-			            score += (100 - fallbackRank); 
+			    // PRIORITY ROUTING LOGIC
+			    // 1. Consulting / preparation / strategy → Nouf
+			    if (lower.includes("prepare") ||
+			        lower.includes("preparation") ||
+			        lower.includes("consult") ||
+			        lower.includes("advise") ||
+			        lower.includes("guidance") ||
+			        lower.includes("analysis") ||
+			        lower.includes("insight")) {
+			        if (active.includes("nouf")) {
+			            return { leadAgent: "nouf", activeAgents: active };
 			        }
+			    }
 			
-			        return { id: agent.id, score };
-			    });
+			    // 2. Operations / scheduling → Omar
+			    if (lower.includes("schedule") ||
+			        lower.includes("meeting") && !lower.includes("prepare") ||
+			        lower.includes("coordinate") ||
+			        lower.includes("arrange")) {
+			        if (active.includes("omar")) {
+			            return { leadAgent: "omar", activeAgents: active };
+			        }
+			    }
 			
-			    // Sort by score descending
-			    scores.sort((a, b) => b.score - a.score);
+			    // 3. Data / charts → Layla
+			    if (lower.includes("chart") ||
+			        lower.includes("data") ||
+			        lower.includes("graph") ||
+			        lower.includes("statistics") ||
+			        lower.includes("report")) {
+			        if (active.includes("layla")) {
+			            return { leadAgent: "layla", activeAgents: active };
+			        }
+			    }
 			
-			    return {
-			        leadAgent: scores[0].id,
-			        activeAgents: activeAgents.map(a => a.id)
-			    };
+			    // 4. Fallback → Hakim (executive reasoning)
+			    if (active.includes("hakim")) {
+			        return { leadAgent: "hakim", activeAgents: active };
+			    }
+			
+			    // Safety fallback (should never happen)
+			    return { leadAgent: active[0], activeAgents: active };
 			}
+
 
 
             function openMeetingsModal(topicId, topicTitle) {
@@ -7506,6 +7538,8 @@ Keep it brief and executive-level.`;
 
 
 </body></html>
+
+
 
 
 
