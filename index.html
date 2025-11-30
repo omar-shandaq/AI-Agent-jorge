@@ -5356,20 +5356,27 @@
                         }
                         return;
                     }
+                    // Filter to only active agents
+                    const activeOnly = routingDecision.agents.filter(id =>
+                        agents.some(a => a.id === id)   // agents = active agents
+                    );
 
                     // Show routing note to the user (non-noisy)
                     const orchestrationNote = document.createElement('div');
                     orchestrationNote.className = 'agent-discussion-indicator';
                     orchestrationNote.style.fontSize = '0.85rem';
                     orchestrationNote.style.opacity = '0.85';
-                    orchestrationNote.innerHTML = `<i class="fas fa-route"></i> Hakim routing to: ${routingDecision.agents.map(id => {
+
+                    orchestrationNote.innerHTML = `<i class="fas fa-route"></i> Hakim routing to: ${activeOnly.map(id => {
                         const agent = personaData.find(p => p.id === id);
                         return agent ? agent.name.split(' ')[0] : id;
                     }).join(', ')}`;
+
                     if (chatMessages) {
                         chatMessages.appendChild(orchestrationNote);
                         chatMessages.scrollTop = chatMessages.scrollHeight;
                     }
+
 
                     // Filter only agents actually selected by the user
                     const selectedAgentIds = routingDecision.agents.filter(id =>
@@ -7513,6 +7520,7 @@ Keep it brief and executive-level.`;
 
 
 </body></html>
+
 
 
 
