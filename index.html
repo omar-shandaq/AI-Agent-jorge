@@ -4780,7 +4780,22 @@
 				newPrepareBtn.addEventListener('click', () => {
                     const prompt = `What preparations do I need for my event: "${title}"? Please consult and advise.`;
                     switchToAgentAndSendPrompt(prompt);
-				});
+
+					// Route
+				    const { leadAgent, activeAgents } = selectLeadAgent(
+				        prompt,
+				        ['nouf', 'omar', 'layla', 'hakim']
+				    );
+				
+				    isMultiAgentMode = true;
+				
+				    // Agents respond (UI already ready)
+				    activeAgents.forEach(aid => {
+				        sendMessageToAgent(prompt, aid, { silent: aid !== leadAgent });
+				    });
+				
+				    closeModal(document.getElementById('event-modal'));
+								});
 
                 openModal(eventModal);
             }
@@ -7506,6 +7521,7 @@ Keep it brief and executive-level.`;
 
 
 </body></html>
+
 
 
 
