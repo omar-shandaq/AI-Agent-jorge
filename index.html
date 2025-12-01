@@ -4444,6 +4444,8 @@ Desired Output: [e.g., "A final draft ready for review."]</p>
             let isMultiAgentMode = false; // Mode: false = single agent, true = multi-agent
             let chatHistory = [];
             let selectedText = '';
+            let conversationLead = null;
+
             // Set "today" to the specified context date: Wednesday, Oct 22, 2025
 
             // --- DOM Elements ---
@@ -4952,6 +4954,7 @@ Desired Output: [e.g., "A final draft ready for review."]</p>
 				newPrepareBtn.addEventListener('click', () => {
                     const prompt = `What preparations do I need for my event: "${title}"? Please consult and advise.`;
                     switchToAgentAndSendPrompt(prompt, 'nouf');
+
 
 					// Route
 				    const { leadAgent, activeAgents } = selectLeadAgent(
@@ -5462,20 +5465,59 @@ Desired Output: [e.g., "A final draft ready for review."]</p>
                 if (!userMessage) return;
 
                 displayMessage('user', userMessage);
-                // Add user message to history *before* calling API
                 chatHistory.push({ role: 'user', parts: [{ text: userMessage }] });
                 chatInput.value = '';
-                
+
+                // -------------------------------
+                // CONTINUATION REPLY LOGIC (YES / OK / PROCEED / CONTINUE)
+                // -------------------------------
+                const shortReply = userMessage.toLowerCase();
+                const continuationReplies = [
+                    "yes", "yep", "sure", "ok", "okay", "please", "proceed",
+                    "go ahead", "continue", "confirm"
+                ];
+
+                if (conversationLead && continuationReplies.includes(shortReply)) {
+
+                    // Continue with the same agent who previously asked a question
+                    const leadAgent = conversationLead;
+                    const activeAgents = getSelectedAgentsInfo().map(a => a.id);
+
+                    showTypingIndicator();
+
+                    // Only the conversation lead should speak; others silent
+                    for (const aid of activeAgents) {
+                        await sendMessageToAgent(userMessage, aid, { silent: aid !== leadAgent });
+                    }
+
+                    return; // IMPORTANT — do NOT re-route
+                }
+
+                // -------------------------------
+                // NORMAL MESSAGE FLOW  
+                // (Since it's not a continuation reply)
+                // -------------------------------
+
+                // Reset previous lead — you are now asking a new question
+                conversationLead = null;
+
                 if (isMultiAgentMode) {
-                    // Multi-agent mode: Hakim orchestrates and routes to appropriate agents
+
+                    // Multi-agent routing (Hakim orchestrates)
                     await orchestrateMultiAgentResponse(userMessage);
+
                 } else {
-                    // Single agent mode: send to the selected agent (use selectedAgents[0] instead of currentPersonaId)
-                    const selectedAgent = selectedAgents.length > 0 ? selectedAgents[0] : currentPersonaId;
+
+                    // Single agent mode
+                    const selectedAgent = selectedAgents.length > 0
+                        ? selectedAgents[0]
+                        : currentPersonaId;
+
                     showTypingIndicator();
                     await sendMessageToAgent(userMessage, selectedAgent);
                 }
             }
+
             
             // Smart agent orchestration: Hakim analyzes prompt and routes to appropriate agents
             // Replace existing orchestrateMultiAgentResponse with this improved version
@@ -5700,6 +5742,9 @@ Desired Output: [e.g., "A final draft ready for review."]</p>
                     const agentResponseText = candidate?.content?.parts?.[0]?.text;
 
                 if (agentResponseText) {
+                    if (agentResponseText.trim().endsWith("?")) {
+                        conversationLead = agentId;   // This agent becomes the lead for follow-ups
+                    }
                     displayMessage('agent', agentResponseText, agentId);
                     // Add successful AI response to history
                     chatHistory.push({ role: 'model', parts: [{ text: agentResponseText }] });
@@ -7715,7 +7760,6 @@ Keep it brief and executive-level.`;
 
 
 </body></html>
-
 
 
 
