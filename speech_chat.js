@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const WS_URL = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${API_KEY}`;
 
     const micBtn = document.getElementById("mic-btn");
-    const chatMessages = document.getElementById("chatMessages");
 
     let ws = null;
     let audioContext = null;
@@ -14,11 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let nextPlayTime = 0;
     let activeSources = [];
     let isAISpeaking = false;
-
-    // Transcript storage
-    let conversationHistory = [];
-    let currentUserTranscript = "";
-    let currentAITranscript = "";
 
     // Visual state management
     function setMicState(state) {
@@ -35,9 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function startSession() {
         setMicState("connecting");
-        conversationHistory = [];
-        currentUserTranscript = "";
-        currentAITranscript = "";
 
         try {
             mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -58,114 +49,47 @@ document.addEventListener("DOMContentLoaded", () => {
                     model: "models/gemini-2.5-flash-native-audio-preview-09-2025",
                     systemInstruction: {
                         parts: [{
-                            text: `You are an AI Strategy Consultant supporting the Saudi Ministry of Human Resources and Social Development (HRSD). You are having a natural voice conversation with His Excellency.
+                            text: `CRITICAL INSTRUCTIONS - ALWAYS FOLLOW:
+1. Address the user as "Your Excellency" or "سعادتكم" in Arabic
+2. Speak naturally - DO NOT output your thinking or reasoning process
+3. Only output what you would actually SAY out loud
+4. Use Saudi Arabic dialect when speaking Arabic
 
-        LANGUAGE & ACCENT:
-        - When speaking Arabic, use Saudi Arabic dialect and expressions
-        - When speaking English, you may use common Saudi/Gulf expressions naturally
-        - Match the language the user speaks to you
+You are an AI Strategy Consultant supporting the Saudi Ministry of Human Resources and Social Development (HRSD). You are having a natural voice conversation with His Excellency.
 
-        ===============================================================================
-        HRSD FOUNDATIONAL KNOWLEDGE BASE
-        ===============================================================================
+LANGUAGE & ACCENT:
+- When speaking Arabic, use Saudi Arabic dialect and expressions
+- When speaking English, you may use common Saudi/Gulf expressions naturally
+- Match the language the user speaks to you
+- ALWAYS address the user respectfully as "Your Excellency"
 
-        VISION:
-        Global leadership in empowering individuals and communities, and enhancing labor market competitiveness.
+===============================================================================
+FOUR ANALYSIS DOMAINS
+===============================================================================
+1. Labor Market Development
+2. Empowerment of Society & Individuals
+3. Non-Profit Sector Enablement
+4. Strategic Partnerships (local & global)
 
-        MISSION:
-        Empowering individuals, society, and institutions, and create a labor market that fosters innovation, sustainability, and keeps pace with future transformations through flexible and effective policies and regulations.
 
-        CORE VALUES: Excellence | Innovation | Responsibility | Mastery | Transparency
+===============================================================================
+VOICE CONVERSATION STYLE
+===============================================================================
 
-        STRATEGIC PILLARS:
-        - One Labor Market
-        - Decent Living For All
-        - High Productivity Economy
-        - Sustainable Corporate Excellence
+- Be natural and conversational - you're having a real talk, not reading a document
+- Keep responses concise: 30-60 seconds when spoken
+- Speak in the language the user uses (English or Arabic)
+- Be warm, confident, and approachable
 
-        STRATEGIC OBJECTIVES:
-        1. Support a harmonious labor market
-        2. Improve productivity and performance of manpower
-        3. Achieve benefit and social justice for all society members
-        4. Achieve the optimal level of customer experience
-        5. Raise the efficiency of spending on public-sector manpower
-        6. Enhance international cooperation and communication
-        7. Ensure effective and comprehensive social care and protection services
-        8. Support and apply labor market reforms
-        9. Raise the level of compliance in the labor market
-        10. Increase the participation and empowerment of the workforce
-        11. Strengthen the self-reliance of families and individuals
-        12. Provide sustainable social development services
-        13. Achieve spending efficiency and enhance revenues
-        14. Enhance digital transformation
-        15. Improve employee experience and satisfaction
-        16. Achieve strategic transformation to organizational and supervisory role
+IMPORTANT - BE HELPFUL, NOT INQUISITIVE:
+- DO NOT ask too many questions - provide value and insights directly
+- When asked something, give a substantive answer first, then optionally offer to explore further
+- Think creatively and share your perspectives freely
+- Make informed assumptions rather than asking for clarification
+- Be decisive and confident in your recommendations
+- Only ask a question if absolutely necessary to provide help
 
-        FOUR SECTORS HRSD OVERSEES:
-        1. Labor Sector - Labor market strategy, workforce policies, private sector employment
-        2. Social Development Sector - Social welfare, disability services, volunteering, NPO support
-        3. Civil Service Sector - Public sector workforce, government HR policies, digital services
-        4. Joint Services Sector - Digital transformation, institutional excellence, cross-government coordination
-
-        ===============================================================================
-        OFFICIAL PROGRAMS & INITIATIVES
-        ===============================================================================
-
-        Vision 2030 Realization Programs HRSD Contributes To:
-        - Human Capability Development Program (HCDP) - 5 indicators, 15 initiatives
-        Three Pillars: Resilient educational base, Prepare for future labor markets, Lifelong learning
-        - Fiscal Sustainability Program - Citizen Account Initiative, Financial Equivalent for Expatriates
-        - Quality of Life Program - Expatriates Satisfaction Indicator
-        - Financial Sector Development Program - Products for Low-income Groups
-
-        Key HRSD Initiatives:
-        - WAAD National Training Campaign - Target: 1,155,000+ training opportunities by end of 2025
-        - Sectoral Skills Councils - Target: 12 sectoral councils with private sector
-        - National Occupational Standards Initiative - Target: 300+ professions standardized
-        - Skills Accelerator Initiative - Target: 162,000 private sector employees for high-level skills
-        - Training Vouchers Initiative - Target: 160,000+ Saudis for skill development
-        - Nitaqat Program - Saudization compliance system
-
-        ===============================================================================
-        OFFICIAL PARTNERSHIPS
-        ===============================================================================
-
-        International: ILO, International Cooperative Alliance, OIC, Arab Labor Organization, G20 Employment Working Group
-
-        Domestic: Ministry of Justice, MEWA, Tourism Commission, Careem, Ataa, Tamkeen Program
-
-        ===============================================================================
-        FOUR ANALYSIS DOMAINS
-        ===============================================================================
-        1. Labor Market Development
-        2. Empowerment of Society & Individuals
-        3. Non-Profit Sector Enablement
-        4. Strategic Partnerships (local & global)
-
-        ===============================================================================
-        HOW TO USE THIS KNOWLEDGE
-        ===============================================================================
-
-        This knowledge base is your FOUNDATION, not a cage. Use it as context to inform your thinking, but feel free to:
-        - Think creatively and propose innovative ideas
-        - Draw connections to global best practices and trends
-        - Suggest new approaches not explicitly listed
-        - Explore hypotheticals and future scenarios
-        - Share your own strategic insights and perspectives
-
-        The above programs, pillars, and objectives give you grounding in HRSD's world - but you're a smart advisor who can think beyond the script.
-
-        ===============================================================================
-        VOICE CONVERSATION STYLE
-        ===============================================================================
-
-        - Be natural and conversational - you're having a real talk, not reading a document
-        - Keep responses concise: 30-60 seconds when spoken
-        - Speak in the language the user uses (English or Arabic)
-        - Be warm, confident, and approachable
-        - Offer to go deeper: "Want me to explore that further?"
-
-        You're a thoughtful strategic partner, not a rigid chatbot. Think freely, advise wisely, and have a genuine conversation.`
+You're a thoughtful strategic partner who provides real value. Think freely, be creative, advise boldly, and have a genuine conversation.`
                         }]
                     },
                     generationConfig: {
@@ -177,10 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 }
                             }
                         }
-                    },
-                    // Enable transcription for both input and output
-                    inputAudioTranscription: {},
-                    outputAudioTranscription: {}
+                    }
                 }
             };
             ws.send(JSON.stringify(setupMsg));
@@ -207,9 +128,6 @@ document.addEventListener("DOMContentLoaded", () => {
         let msg = {};
         try { msg = JSON.parse(event.data); } catch { return; }
 
-        // Log all messages to see what transcript fields exist
-        console.log("Server message:", JSON.stringify(msg, null, 2));
-
         if (msg.error) {
             console.error("API Error:", msg.error);
             return;
@@ -221,34 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
             setMicState("listening");
             startMicStreaming();
             return;
-        }
-
-        // Try various possible transcript field names
-        const serverContent = msg.serverContent || {};
-        
-        // User input transcript (try multiple possible field names)
-        if (serverContent.inputTranscript) {
-            currentUserTranscript = serverContent.inputTranscript;
-            console.log("User transcript:", currentUserTranscript);
-        }
-        if (serverContent.transcript) {
-            currentUserTranscript = serverContent.transcript;
-            console.log("User transcript (alt):", currentUserTranscript);
-        }
-        
-        // AI output transcript
-        if (serverContent.outputTranscript) {
-            currentAITranscript += serverContent.outputTranscript;
-            console.log("AI transcript:", serverContent.outputTranscript);
-        }
-        if (serverContent.modelTurn?.parts) {
-            for (const part of serverContent.modelTurn.parts) {
-                // Check if there's text alongside audio
-                if (part.text) {
-                    currentAITranscript += part.text;
-                    console.log("AI text part:", part.text);
-                }
-            }
         }
 
         if (msg.serverContent?.modelTurn?.parts) {
@@ -264,16 +154,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (msg.serverContent?.turnComplete) {
             isAISpeaking = false;
             setMicState("listening");
-            
-            // Save completed turn to history
-            if (currentUserTranscript || currentAITranscript) {
-                conversationHistory.push({
-                    user: currentUserTranscript,
-                    ai: currentAITranscript
-                });
-                currentUserTranscript = "";
-                currentAITranscript = "";
-            }
         }
 
         if (msg.serverContent?.interrupted) {
@@ -371,56 +251,6 @@ document.addEventListener("DOMContentLoaded", () => {
         processor = null;
         audioContext = null;
         ws = null;
-
-        // Display transcript in chat
-        displayTranscriptInChat();
-    }
-
-    function displayTranscriptInChat() {
-        if (!chatMessages || conversationHistory.length === 0) return;
-
-        // Add voice conversation header
-        const header = document.createElement("div");
-        header.style.cssText = "text-align: center; padding: 15px 10px; color: var(--text-light); font-size: 12px; opacity: 0.8; border-top: 1px solid var(--border-color); margin-top: 15px;";
-        header.innerHTML = `<i class="fas fa-microphone"></i> Voice Conversation Transcript`;
-        chatMessages.appendChild(header);
-
-        // Add each exchange
-        conversationHistory.forEach(exchange => {
-            // User message
-            if (exchange.user && exchange.user.trim()) {
-                const userBubble = document.createElement("div");
-                userBubble.className = "message-bubble user";
-                userBubble.innerHTML = `
-                    <div class="content">${escapeHtml(exchange.user)}</div>
-                    <img src="https://pbs.twimg.com/profile_images/1902451967101636610/TQ-VQEPY_400x400.jpg" alt="User" class="avatar">
-                `;
-                chatMessages.appendChild(userBubble);
-            }
-
-            // AI response
-            if (exchange.ai && exchange.ai.trim()) {
-                const aiBubble = document.createElement("div");
-                aiBubble.className = "message-bubble agent";
-                aiBubble.innerHTML = `
-                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=VoiceAI" alt="AI" class="avatar">
-                    <div class="content"><span class="agent-name-tag">Voice Assistant</span><div>${escapeHtml(exchange.ai)}</div></div>
-                `;
-                chatMessages.appendChild(aiBubble);
-            }
-        });
-
-        // Scroll to bottom
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-        
-        // Clear for next session
-        conversationHistory = [];
-    }
-
-    function escapeHtml(text) {
-        const div = document.createElement("div");
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     function floatTo16(input) {
