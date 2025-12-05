@@ -10,10 +10,10 @@
     <!-- Include Chart.js from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!--For the voice agent-->
-    <script src="voicemanager.js"></script>
+    <script src="voiceManager.js"></script>
     <style>
         /* HRSD Font Faces */
-        @font-face {https://github.com/omar-shandaq/AI-Agent-/edit/main/index.html
+        @font-face {
             font-family: 'HRSD';
             src: local('HRSD-Regular');
             font-weight: 400;
@@ -1098,9 +1098,10 @@
             padding: 15px 20px;
             border-radius: 32px; /* Curve both left and right edges */
             flex-shrink: 0;
-            overflow: visible; /* Allow dropdowns to overflow */
+            overflow: hidden; /* Allow dropdowns to overflow */
             position: relative; /* For absolute positioned children */
             height: auto !important;
+            max-height: 160px !important;
         }
         .chat-input-controls { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         #chatInput {
@@ -1114,6 +1115,8 @@
             font-size: 1rem;
             padding: 12px 0;
             font-family: 'Poppins', sans-serif;
+			resize: none;
+			overflow: hidden !important;
         }
         #chatInput::placeholder { color: var(--text-light); opacity: 0.6; }
         .chat-input-controls button {
@@ -4750,7 +4753,7 @@
 
         chatInput.addEventListener("input", () => {
             chatInput.style.height = "auto";
-            //chatInput.style.height = chatInput.scrollHeight + "px";
+            chatInput.style.height = chatInput.scrollHeight + "px";
             
             // Toggle mic/send button based on input content
             if (chatInputControls) {
@@ -6071,7 +6074,7 @@
                  } catch (e) {
                      console.error("Chart.js rendering error:", e);
                      console.error("Chart data:", chartData);
-                     canvasElement.parentElement.innerHTML = `<p style='color: #ffcccc; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;'>⚠️ Chart rendering failed: ${e.message || 'Unknown error'}</p>`;
+                     canvasElement.parentElement.innerHTML = `<p style='color: #ffcccc; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;'⚠️ Chart rendering failed: ${e.message || 'Unknown error'}</p>`;
                  }
             }
 
@@ -7443,23 +7446,7 @@ ${truncatedText}
                 'strategic-partnerships': 'Strategic Partnerships'
             };
             
-            // --- Twitter / X configuration for topic-specific news ---
-            // Per-topic advanced search URLs come from focus_areas_curl_commands.txt (used server-side in the Vercel proxy)
-            const twitterSearchConfig = {
-                'labor-market': {
-                    url: 'https://api.twitterapi.io/twitter/tweet/advanced_search?query=%28from%3AAlArabiya_Eng%20OR%20from%3Aarabnews%20OR%20from%3AalekhbariyaEN%29%20AND%20%28Saudi%20labor%20OR%20labor%20market%20OR%20Saudi%20jobs%20OR%20employment%20OR%20workforce%29&queryType=Latest&limit=50'
-                },
-                'empowerment': {
-                    url: 'https://api.twitterapi.io/twitter/tweet/advanced_search?query=%28from%3AAlArabiya_Eng%20OR%20from%3Aarabnews%20OR%20from%3AalekhbariyaEN%29%20AND%20%28saudi%20society%20OR%20saudi%20community%20OR%20saudi%20social%20development%29&queryType=Latest&limit=50'
-                },
-                'non-profit': {
-                    url: 'https://api.twitterapi.io/twitter/tweet/advanced_search?query=%28from%3AAlArabiya_Eng%20OR%20from%3Aarabnews%20OR%20from%3AalekhbariyaEN%29%20AND%20%28saudi%20donation%20OR%20saudi%20volunteer%20OR%20saudi%20non-profit%20OR%20saudi%20non-profit%20sector%20OR%20saudi%20charity%29&queryType=Latest&limit=50'
-                },
-                'strategic-partnerships': {
-                    url: 'https://api.twitterapi.io/twitter/tweet/advanced_search?query=%28from%3AAlArabiya_Eng%20OR%20from%3Aarabnews%20OR%20from%3AalekhbariyaEN%29%20AND%20%28saudi%20strategic%20partnerships%20OR%20saudi%20strategic%20agreements%20OR%20saudi%20mou%20OR%20saudi%20collaboration%29&queryType=Latest&limit=50'
-                }
-            };
-            
+
             // Gemini endpoint for executive summaries of tweets (use separate key to reduce rate limiting)
             const geminiSummaryEndpoint = GEMINI_SUMMARY_MODEL_URL;
             
