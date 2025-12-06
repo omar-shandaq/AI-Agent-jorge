@@ -5952,6 +5952,7 @@
                 if (chatMessages) { // Ensure chatMessages exists
                     chatMessages.appendChild(messageBubble); // Error might have happened here if messageBubble was invalid
 
+					chatMessages.scrollTop = messageBubble.offsetTop;
                     // Scroll logic and chart rendering timeout remain the same
                     if (chartData && canvasId && sender === 'agent') {
                          setTimeout(() => {
@@ -8966,6 +8967,7 @@ document.querySelectorAll(".topic-card").forEach(card => {
 
 </script>
 </body></html>
+
 
 
 
