@@ -6519,7 +6519,7 @@ ${truncatedText}
             // Special function for orchestration requests (no display, just return response)
             async function sendOrchestrationRequest(prompt, retries = 2) {
                 //const apiKey = "AIzaSyCRFXs-Ysnoy2swH1yjqZYoRMNC4HTpv_c";
-				const apiKey = "AIzaSyDzmoPBVktGbM8wGjGZ7HPGoydhTON3c2o";
+				const apiKey = "AIzaSyBVD8eHTuiY5h7yNDGvcq50W7u2XortDnQ";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
                 const payload = {
@@ -6560,7 +6560,7 @@ ${truncatedText}
             
             async function sendMessageToAgent(message, agentId, retries = 3, delay = 1000) {
                 // const apiKey = "AIzaSyCRFXs-Ysnoy2swH1yjqZYoRMNC4HTpv_c";
-				const apiKey = "AIzaSyDzmoPBVktGbM8wGjGZ7HPGoydhTON3c2o";
+				const apiKey = "AIzaSyBVD8eHTuiY5h7yNDGvcq50W7u2XortDnQ";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
                 const persona = personaData.find(p => p.id === agentId);
@@ -6723,7 +6723,7 @@ ${truncatedText}
                 options = Object.assign({ systemPromptOverride: null, silent: false }, options);
 
                 // const apiKey = "AIzaSyCRFXs-Ysnoy2swH1yjqZYoRMNC4HTpv_c";
-				const apiKey = "AIzaSyDzmoPBVktGbM8wGjGZ7HPGoydhTON3c2o";
+				const apiKey = "AIzaSyBVD8eHTuiY5h7yNDGvcq50W7u2XortDnQ";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
                 const persona = personaData.find(p => p.id === agentId);
@@ -8648,7 +8648,7 @@ async function sendMessageToAgent(message, agentId, options = {}) {
     const { silent = false, retries = 3, delay = 1000 } = options || {};
 
     // Use API key that was in the file; if you want to change it centrally, update here.
-    const apiKey = "AIzaSyDzmoPBVktGbM8wGjGZ7HPGoydhTON3c2o";
+    const apiKey = "AIzaSyBVD8eHTuiY5h7yNDGvcq50W7u2XortDnQ";
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
     const persona = (typeof personaData !== 'undefined') ? personaData.find(p => p.id === agentId) : null;
@@ -9068,6 +9068,7 @@ document.querySelectorAll(".topic-card").forEach(card => {
 
 </script>
 </body></html>
+
 
 
 
