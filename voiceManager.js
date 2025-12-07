@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const API_KEY = "AIzaSyCuzdpN1ZLwRjsaV8tJg9AlI0PPjO1n_DE";
+    const API_KEY = "AIzaSyDD25Djcy7MlAUEzSxi-Pre4BFiEA6PZss";
     const WS_URL = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${API_KEY}`;
 
     const micBtn = document.getElementById("mic-btn");
@@ -276,6 +276,7 @@ You're a thoughtful strategic partner who provides real value. Think freely, be 
         return buffer;
     }
 });
+
 
 
 
