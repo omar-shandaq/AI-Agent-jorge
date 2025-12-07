@@ -3819,22 +3819,47 @@
             scrollbar-width: thin;
             white-space: pre-wrap;
         }
-		.chat-overlay {
-		    position: absolute;
-		    top: 0;
-		    left: 0;
-		    width: 100%;
-		    height: 100%;
-		    background: rgba(0, 0, 0, 0.55); /* Dark overlay */
-		    opacity: 0;
-		    pointer-events: none;
-		    transition: opacity 0.25s ease;
-		    z-index: 20;
+		
+		/* GLOBAL overlay that covers the viewport as a guaranteed fallback */
+		.chat-overlay-global {
+		  position: fixed;
+		  inset: 0;                     /* top:0; right:0; bottom:0; left:0 */
+		  background: rgba(0,0,0,0.55);
+		  opacity: 0;
+		  visibility: hidden;
+		  transition: opacity 220ms ease, visibility 220ms;
+		  z-index: 99999;               /* very high to sit above everything */
+		  pointer-events: none;         /* won't block clicks unless we want it to */
 		}
 		
-		.chat-overlay.active {
-		    opacity: 1;
+		/* when active — visible */
+		.chat-overlay-global.active {
+		  opacity: 1;
+		  visibility: visible;
+		  pointer-events: auto;         /* optional: catch clicks while overlay active */
 		}
+		
+		/* Optional small centered indicator text */
+		.chat-overlay-indicator {
+		  position: fixed;
+		  top: 50%;
+		  left: 50%;
+		  transform: translate(-50%, -50%);
+		  color: #fff;
+		  background: rgba(0,0,0,0.45);
+		  padding: 10px 16px;
+		  border-radius: 10px;
+		  font-weight: 600;
+		  font-size: 14px;
+		  z-index: 100000; /* above overlay */
+		  pointer-events: none;
+		  opacity: 0;
+		  transition: opacity 220ms;
+		}
+		.chat-overlay-global.active + .chat-overlay-indicator {
+		  opacity: 1;
+		}
+
 
 
 /* Focus Area Maximize Modal styles (agent-info style) */
@@ -5015,6 +5040,40 @@
 
             // --- Function Definitions ---
 
+			// --- Overlay utilities (robust fallback) ---
+			function ensureGlobalOverlay() {
+			    // If already present, return it
+			    let overlay = document.getElementById('chatOverlayGlobal');
+			    if (overlay) return overlay;
+			
+			    // Create overlay and indicator and append to body so it can't be obscured by layout
+			    overlay = document.createElement('div');
+			    overlay.id = 'chatOverlayGlobal';
+			    overlay.className = 'chat-overlay-global';
+			    document.body.appendChild(overlay);
+			
+			    const indicator = document.createElement('div');
+			    indicator.id = 'chatOverlayIndicator';
+			    indicator.className = 'chat-overlay-indicator';
+			    indicator.textContent = 'Voice mode active';
+			    document.body.appendChild(indicator);
+			
+			    console.log('[VoiceOverlay] created global overlay');
+			    return overlay;
+			}
+			
+			function showOverlayGlobal() {
+			    const el = ensureGlobalOverlay();
+			    el.classList.add('active');
+			    // also add small log for debugging
+			    console.log('[VoiceOverlay] showOverlayGlobal() called');
+			}
+			
+			function hideOverlayGlobal() {
+			    const el = document.getElementById('chatOverlayGlobal');
+			    if (el) el.classList.remove('active');
+			    console.log('[VoiceOverlay] hideOverlayGlobal() called');
+			}
 
 
             function buildTemplatePrompt(templateType, userPrompt) {
@@ -8996,6 +9055,7 @@ document.querySelectorAll(".topic-card").forEach(card => {
 
 </script>
 </body></html>
+
 
 
 
