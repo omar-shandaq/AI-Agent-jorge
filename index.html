@@ -1629,6 +1629,7 @@
 
         .agenda-view.active {
             display: block;
+            overflow-y: auto;
         }
 
         #today-view.active,
@@ -1636,6 +1637,12 @@
             display: flex !important; /* Use flex for week view grid */
             flex-direction: column;
             gap: 15px;
+            overflow-y: auto;
+            min-height: 0;
+        }
+        
+        #today-view.active {
+            flex: 1;
         }
 
         #month-view.active {
@@ -1828,8 +1835,26 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            min-height: 0;
+            padding-bottom: 20px;
+            padding-right: 8px;
         }
-        .desktop-calendar { display: block; }
+        
+        #today-view::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #today-view::-webkit-scrollbar-thumb {
+            background: var(--primary-blue);
+            border-radius: 4px;
+        }
+        .desktop-calendar { 
+            display: flex; 
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
         .mobile-calendar { display: none; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; flex: 1; overflow-y: auto; max-height: calc(100vh - 250px); padding-bottom: 80px; }
         
@@ -4099,7 +4124,7 @@
                             <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Hakim" alt="Agent Avatar" class="avatar" data-persona-avatar="">
                             <div class="content">Welcome Your Excellency. As-salāmu 'alaykum. I am Hakim, your AI Executive Office Agent. How may I assist you today?</div>
                         </div>
-                    <div class="message-bubble user"><div class="content">Can you dig deeper into the topic of "Empowering Society &amp; Individuals" for me? Provide key details and current status.</div><img src="userimage.jpg" alt="user Avatar" class="avatar"></div><div class="message-bubble agent"><img src="https://api.dicebear.com/7.x/bottts/svg?seed=Hakim" alt="agent Avatar" class="avatar" data-persona-avatar=""><div class="content"><span class="agent-name-tag">Hakim Nüruddin</span><div><p><strong>To Your Excellency,</strong></p>
+                    <div class="message-bubble user"><div class="content">Can you dig deeper into the topic of "Empowering Society &amp; Individuals" for me? Provide key details and current status.</div><img src="userimage.png" alt="user Avatar" class="avatar"></div><div class="message-bubble agent"><img src="https://api.dicebear.com/7.x/bottts/svg?seed=Hakim" alt="agent Avatar" class="avatar" data-persona-avatar=""><div class="content"><span class="agent-name-tag">Hakim Nüruddin</span><div><p><strong>To Your Excellency,</strong></p>
 <p>The topic of "Empowering Society &amp; Individuals" is a central axis of the National Transformation Program and HRSD’s mandate. It moves beyond mere provision of services toward <em>sustainable enablement</em> and the cultivation of a productive, self-reliant citizenry.</p>
 <p>Here is a strategic summary detailing the key focus areas and current status as of Q4 2025.</p>
 <hr>
@@ -5865,7 +5890,7 @@
                 const personaId = (agentId && agentId !== false) ? agentId : currentPersonaId;
                 const persona = personaData.find(p => p.id === personaId);
                 const avatarSrc = sender === 'user'
-                    ? 'https://pbs.twimg.com/profile_images/1902451967101636610/TQ-VQEPY_400x400.jpg'
+                    ? 'userimage.png'
                     : (persona ? persona.smallImg : 'https://placehold.co/40x40/00A99D/ffffff?text=AI');
 
                 const messageBubble = document.createElement('div');
@@ -6490,7 +6515,7 @@ ${truncatedText}
             // Special function for orchestration requests (no display, just return response)
             async function sendOrchestrationRequest(prompt, retries = 2) {
                 //const apiKey = "AIzaSyCRFXs-Ysnoy2swH1yjqZYoRMNC4HTpv_c";
-				const apiKey = "AIzaSyCRFXs-Ysnoy2swH1yjqZYoRMNC4HTpv_c";
+				const apiKey = "AIzaSyDCl2Zmr6AGqVOdCJgKEZ_gCcXkYlJYHas";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
                 const payload = {
@@ -6531,7 +6556,7 @@ ${truncatedText}
             
             async function sendMessageToAgent(message, agentId, retries = 3, delay = 1000) {
                 // const apiKey = "AIzaSyCRFXs-Ysnoy2swH1yjqZYoRMNC4HTpv_c";
-				const apiKey = "AIzaSyCRFXs-Ysnoy2swH1yjqZYoRMNC4HTpv_c";
+				const apiKey = "AIzaSyDCl2Zmr6AGqVOdCJgKEZ_gCcXkYlJYHas";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
                 const persona = personaData.find(p => p.id === agentId);
@@ -6694,7 +6719,7 @@ ${truncatedText}
                 options = Object.assign({ systemPromptOverride: null, silent: false }, options);
 
                 // const apiKey = "AIzaSyCRFXs-Ysnoy2swH1yjqZYoRMNC4HTpv_c";
-				const apiKey = "AIzaSyCRFXs-Ysnoy2swH1yjqZYoRMNC4HTpv_c";
+				const apiKey = "AIzaSyDCl2Zmr6AGqVOdCJgKEZ_gCcXkYlJYHas";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
                 const persona = personaData.find(p => p.id === agentId);
@@ -8619,7 +8644,7 @@ async function sendMessageToAgent(message, agentId, options = {}) {
     const { silent = false, retries = 3, delay = 1000 } = options || {};
 
     // Use API key that was in the file; if you want to change it centrally, update here.
-    const apiKey = "AIzaSyCRFXs-Ysnoy2swH1yjqZYoRMNC4HTpv_c";
+    const apiKey = "AIzaSyDCl2Zmr6AGqVOdCJgKEZ_gCcXkYlJYHas";
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
     const persona = (typeof personaData !== 'undefined') ? personaData.find(p => p.id === agentId) : null;
@@ -9039,8 +9064,6 @@ document.querySelectorAll(".topic-card").forEach(card => {
 
 </script>
 </body></html>
-
-
 
 
 
