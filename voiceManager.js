@@ -14,14 +14,41 @@ document.addEventListener("DOMContentLoaded", () => {
     let activeSources = [];
     let isAISpeaking = false;
 
-    // --- Overlay control ---
-    function showOverlay() {
-        document.getElementById("chatOverlay")?.classList.add("active");
+    // --- Overlay utilities (robust fallback) ---
+    function ensureGlobalOverlay() {
+        // If already present, return it
+        let overlay = document.getElementById('chatOverlayGlobal');
+        if (overlay) return overlay;
+    
+        // Create overlay and indicator and append to body so it can't be obscured by layout
+        overlay = document.createElement('div');
+        overlay.id = 'chatOverlayGlobal';
+        overlay.className = 'chat-overlay-global';
+        document.body.appendChild(overlay);
+    
+        const indicator = document.createElement('div');
+        indicator.id = 'chatOverlayIndicator';
+        indicator.className = 'chat-overlay-indicator';
+        indicator.textContent = 'Voice mode active';
+        document.body.appendChild(indicator);
+    
+        console.log('[VoiceOverlay] created global overlay');
+        return overlay;
+    }
+    
+    function showOverlayGlobal() {
+        const el = ensureGlobalOverlay();
+        el.classList.add('active');
+        // also add small log for debugging
+        console.log('[VoiceOverlay] showOverlayGlobal() called');
+    }
+    
+    function hideOverlayGlobal() {
+        const el = document.getElementById('chatOverlayGlobal');
+        if (el) el.classList.remove('active');
+        console.log('[VoiceOverlay] hideOverlayGlobal() called');
     }
 
-    function hideOverlay() {
-        document.getElementById("chatOverlay")?.classList.remove("active");
-    }
 
     // Visual state management
     function setMicState(state) {
@@ -121,7 +148,7 @@ You're a thoughtful strategic partner who provides real value. Think freely, be 
         };
 
         ws.onclose = () => {
-            hideOverlay();
+            hideOverlayGlobal();
             stopSession();
         };
 
@@ -147,7 +174,7 @@ You're a thoughtful strategic partner who provides real value. Think freely, be 
             isSetupComplete = true;
             isRecording = true;
             setMicState("listening");
-            showOverlay();  //newly added
+            showOverlayGlobal();  //newly added
             startMicStreaming();
             return;
         }
@@ -248,7 +275,7 @@ You're a thoughtful strategic partner who provides real value. Think freely, be 
     }
 
     function stopSession() {
-        hideOverlay(); 
+        hideOverlayGlobal(); 
         isRecording = false;
         isSetupComplete = false;
         setMicState(null);
@@ -275,6 +302,7 @@ You're a thoughtful strategic partner who provides real value. Think freely, be 
         return buffer;
     }
 });
+
 
 
 
