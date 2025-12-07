@@ -14,6 +14,15 @@ document.addEventListener("DOMContentLoaded", () => {
     let activeSources = [];
     let isAISpeaking = false;
 
+    // --- Overlay control ---
+    function showOverlay() {
+        document.getElementById("chatOverlay")?.classList.add("active");
+    }
+
+    function hideOverlay() {
+        document.getElementById("chatOverlay")?.classList.remove("active");
+    }
+
     // Visual state management
     function setMicState(state) {
         micBtn.classList.remove("mic-listening", "mic-speaking", "mic-connecting");
@@ -112,6 +121,7 @@ You're a thoughtful strategic partner who provides real value. Think freely, be 
         };
 
         ws.onclose = () => {
+            hideOverlay();
             stopSession();
         };
 
@@ -137,6 +147,7 @@ You're a thoughtful strategic partner who provides real value. Think freely, be 
             isSetupComplete = true;
             isRecording = true;
             setMicState("listening");
+            showOverlay();  //newly added
             startMicStreaming();
             return;
         }
@@ -237,6 +248,7 @@ You're a thoughtful strategic partner who provides real value. Think freely, be 
     }
 
     function stopSession() {
+        hideOverlay(); 
         isRecording = false;
         isSetupComplete = false;
         setMicState(null);
@@ -263,6 +275,7 @@ You're a thoughtful strategic partner who provides real value. Think freely, be 
         return buffer;
     }
 });
+
 
 
 
