@@ -3820,44 +3820,26 @@
             white-space: pre-wrap;
         }
 		
-		/* GLOBAL overlay that covers the viewport as a guaranteed fallback */
-		.chat-overlay-global {
-		  position: fixed;
-		  inset: 0;                     /* top:0; right:0; bottom:0; left:0 */
-		  background: rgba(0,0,0,0.55);
-		  opacity: 0;
-		  visibility: hidden;
-		  transition: opacity 220ms ease, visibility 220ms;
-		  z-index: 99999;               /* very high to sit above everything */
-		  pointer-events: none;         /* won't block clicks unless we want it to */
+		#chatMessages {
+		    position: relative;
+		    overflow: hidden;
 		}
 		
-		/* when active — visible */
-		.chat-overlay-global.active {
-		  opacity: 1;
-		  visibility: visible;
-		  pointer-events: auto;         /* optional: catch clicks while overlay active */
+		#chatOverlay {
+		    position: absolute;
+		    inset: 0;
+		    background: rgba(0,0,0,0.45);
+		    opacity: 0;
+		    visibility: hidden;
+		    pointer-events: none;
+		    transition: opacity .25s ease;
+		    z-index: 10;
 		}
 		
-		/* Optional small centered indicator text */
-		.chat-overlay-indicator {
-		  position: fixed;
-		  top: 50%;
-		  left: 50%;
-		  transform: translate(-50%, -50%);
-		  color: #fff;
-		  background: rgba(0,0,0,0.45);
-		  padding: 10px 16px;
-		  border-radius: 10px;
-		  font-weight: 600;
-		  font-size: 14px;
-		  z-index: 100000; /* above overlay */
-		  pointer-events: none;
-		  opacity: 0;
-		  transition: opacity 220ms;
-		}
-		.chat-overlay-global.active + .chat-overlay-indicator {
-		  opacity: 1;
+		#chatOverlay.active {
+		    opacity: 1;
+		    visibility: visible;
+		    pointer-events: auto;
 		}
 
 
@@ -4165,8 +4147,10 @@
 <p>The next phase requires moving from <em>program implementation</em> to <em>holistic ecosystem measurement</em>.</p>
 <p>The primary risk is the potential for program overlap or lack of alignment between national training initiatives (Pillar 1) and social benefit conditioning (Pillar 2).</p>
 <p><strong>Recommendation:</strong> We must prioritize the development of a unified <strong>Individual Empowerment Index (IEI)</strong>. This index will move beyond simple employment figures to measure the sustained financial independence, quality of life, and civic contribution of individuals leaving assistance programs, ensuring true, long-term empowerment rather than temporary relief.</p>
-</div></div></div></div>
+</div></div></div>
 					<div id="chatOverlay" class="chat-overlay"></div>
+					</div>
+					
                     <div class="chat-input-area">
                         <textarea  id="chatInput" type="text" placeholder="Ask me anything... Type or Talk" rows="1"></textarea>
                         <div class="chat-input-controls">
@@ -9055,6 +9039,7 @@ document.querySelectorAll(".topic-card").forEach(card => {
 
 </script>
 </body></html>
+
 
 
 
