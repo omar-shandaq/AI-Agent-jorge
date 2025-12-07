@@ -3819,6 +3819,22 @@
             scrollbar-width: thin;
             white-space: pre-wrap;
         }
+		.chat-overlay {
+		    position: absolute;
+		    top: 0;
+		    left: 0;
+		    width: 100%;
+		    height: 100%;
+		    background: rgba(0, 0, 0, 0.55); /* Dark overlay */
+		    opacity: 0;
+		    pointer-events: none;
+		    transition: opacity 0.25s ease;
+		    z-index: 20;
+		}
+		
+		.chat-overlay.active {
+		    opacity: 1;
+		}
 
 
 /* Focus Area Maximize Modal styles (agent-info style) */
@@ -4125,6 +4141,7 @@
 <p>The primary risk is the potential for program overlap or lack of alignment between national training initiatives (Pillar 1) and social benefit conditioning (Pillar 2).</p>
 <p><strong>Recommendation:</strong> We must prioritize the development of a unified <strong>Individual Empowerment Index (IEI)</strong>. This index will move beyond simple employment figures to measure the sustained financial independence, quality of life, and civic contribution of individuals leaving assistance programs, ensuring true, long-term empowerment rather than temporary relief.</p>
 </div></div></div></div>
+					<div id="chatOverlay" class="chat-overlay"></div>
                     <div class="chat-input-area">
                         <textarea  id="chatInput" type="text" placeholder="Ask me anything... Type or Talk" rows="1"></textarea>
                         <div class="chat-input-controls">
@@ -8979,6 +8996,7 @@ document.querySelectorAll(".topic-card").forEach(card => {
 
 </script>
 </body></html>
+
 
 
 
